@@ -24,6 +24,7 @@ struct sprite_speed *Sprite_speed;
 // starship states
 enum 
 { 
+  S_NONE,
   S_ALIEN1_PREPARE, S_ALIEN1_CONVOY, S_ALIEN1_HOMING, S_ALIEN1_HOME,
   S_ALIEN1_ATTACK, S_ALIEN1_EXPLODING, S_ALIEN1_DEAD
 };
@@ -102,18 +103,27 @@ void create_sine_table()
 
 void create_ships()
 {
+  int i;
   int path_type = 1;
   struct path_segment *path;
-  Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
-  Starship[0].x = 200*FPSCALE;
-  Starship[0].y = 240*FPSCALE;
-  Starship[0].sprite = 32;
-  Starship[0].shape = 3*4; // shape base, added rotation 0-3
-  Starship[0].path_type = path_type; // type 0 path
   path = Path_types[path_type].path;
-  Starship[0].a = path[0].a;
-  Starship[0].path_state = 0;
-  Starship[0].path_count = 100;
+  Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
+
+  for(i = 0; i < SHIPS_MAX; i++)
+    Starship[i].state = S_NONE;
+
+  for(i = 0; i < 8; i++)
+  {
+    Starship[i].x = (160+24*i)*FPSCALE;
+    Starship[i].y = 240*FPSCALE;
+    Starship[i].state = S_ALIEN1_CONVOY;
+    Starship[i].sprite = 32+i;
+    Starship[i].shape = 3*4; // shape base, added rotation 0-3
+    Starship[i].path_type = path_type; // type 0 path
+    Starship[i].a = path[0].a;
+    Starship[i].path_state = 0;
+    Starship[i].path_count = path[0].n;
+  }
 }
 
 // calculate next frame x y for the starship
@@ -122,6 +132,8 @@ void ship_frame(struct starship *s)
   int v;
   struct path_segment *path;
   path = Path_types[s->path_type].path;
+  if(s->state == S_NONE)
+    return;
   if( s->path_count )
   {
     s->path_count--;
@@ -198,7 +210,8 @@ void loop()
 {
   int i;
 
-  ship_frame( &(Starship[0]) );
+  for(i = 0; i < SHIPS_MAX; i++)
+    ship_frame( &(Starship[i]) );
 
   if(0)
   for(i = 0; i < c2.n_sprites; i++)
