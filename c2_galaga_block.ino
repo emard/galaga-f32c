@@ -31,32 +31,25 @@ enum
 struct path_segment
 {
   int v; // velocity, v = FPSCALE --> 1 pixel/frame
-  uint8_t a; // angle 0-255 covers 0-360 degrees, 0->right, 64->up, 128->left, 192->down
+  uint8_t a; // initial angle 0-255 covers 0-360 degrees, 0->right, 64->up, 128->left, 192->down
+  int8_t r; // rotation (angle increment)
   int n; // how many frames to run on this path segment, 0 for last
 };
 
 struct path_segment stage1_convoy[] =
 {
-  {FPSCALE,   0, 100 }, // right 100 frames
-  {FPSCALE,  64, 100 }, // up 100 fames
-  {FPSCALE, 128, 100 }, // left 100 fames
-  {FPSCALE, 192, 100 }, // down 100 fames 
-  {FPSCALE,   0,  50 }, // right 50 frames
-  {FPSCALE,  32,  50 }, // right 50 frames
-  {FPSCALE,  64,  50 }, // up 50 fames
-  {FPSCALE,  96,  50 }, // up 50 fames
-  {FPSCALE, 128,  50 }, // left 50 fames
-  {FPSCALE, 160,  50 }, // left 50 fames
-  {FPSCALE, 192,  50 }, // down 50 fames 
-  {FPSCALE, 224,  50 }, // down 50 fames 
-  {FPSCALE,   0,  50 }, // right 50 frames
-  {FPSCALE,  32,  50 }, // right 50 frames
-  {FPSCALE,  64,  50 }, // up 50 fames
-  {FPSCALE,  96,  50 }, // up 50 fames
-  {FPSCALE, 128,  50 }, // left 50 fames
-  {FPSCALE, 160,  50 }, // left 50 fames
-  {FPSCALE, 192,  50 }, // down 50 fames 
-  {FPSCALE, 224,  50 }, // down 50 fames 
+  {FPSCALE,   0, 0, 50 }, // right 50 frames
+  {FPSCALE,  32, 0, 50 }, // right-up 50 frames
+  {FPSCALE,  64, 0, 50 }, // up 50 fames
+  {FPSCALE,  96, 0, 50 }, // up-left 50 fames
+  {FPSCALE, 128, 0, 50 }, // left 50 fames
+  {FPSCALE, 160, 0, 50 }, // left-down 50 fames
+  {FPSCALE, 192, 0, 50 }, // down 50 fames
+  {FPSCALE, 224, 0, 50 }, // down-right 50 fames
+  {FPSCALE,   0, 1, 256 }, // left circle 256 frames
+  {FPSCALE,   0,-1, 256 }, // right circle 256 frames
+  {FPSCALE,   0, 1, 256 }, // left circle 256 frames
+  {FPSCALE,   0,-1, 256 }, // right circle 256 frames
   {0,0,0} // end
 };
 
@@ -76,6 +69,7 @@ int *isin; // sine table for angles 0-255
 struct starship
 {
   int x,y; // current coordinates of this starship (x256)
+  uint8_t a; // current angle of movement
   int state; // the state number
   int sprite; // sprite number which is used to display this starship
   int shape; // sprite base carrying the shape
@@ -99,6 +93,7 @@ void create_ships()
   Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
   Starship[0].x = 320*FPSCALE;
   Starship[0].y = 200*FPSCALE;
+  Starship[0].a = 0;
   Starship[0].sprite = 32;
   Starship[0].shape = 3*4; // shape base
   Starship[0].path_state = 0;
@@ -109,14 +104,14 @@ void create_ships()
 void ship_frame(struct starship *s)
 {
   int v;
-  uint8_t a; // angle
+  // uint8_t a; // angle
   if( s->path_count )
   {
     s->path_count--;
-    a = stage1_convoy[s->path_state].a;
-    s->x += isin[(64 + a) & 255]; // cosine
-    s->y -= isin[      a  & 255]; // sine
-    c2.sprite_link_content(s->shape + a / 64, s->sprite);
+    s->a += stage1_convoy[s->path_state].r; // rotate
+    s->x += isin[(64 + s->a) & 255]; // cosine
+    s->y -= isin[      s->a  & 255]; // sine
+    c2.sprite_link_content(s->shape + s->a / 64, s->sprite);
     c2.Sprite[s->sprite]->x = s->x / FPSCALE;
     c2.Sprite[s->sprite]->y = s->y / FPSCALE;
   }
@@ -125,11 +120,12 @@ void ship_frame(struct starship *s)
     if( stage1_convoy[s->path_state+1].n > 0 )
     {
       s->path_state++;
-      a = stage1_convoy[s->path_state].a;
       s->path_count = stage1_convoy[s->path_state].n;
-      s->x += isin[(64 + a) & 255]; // cosine
-      s->y -= isin[      a  & 255]; // sine
-      c2.sprite_link_content(s->shape + a / 64, s->sprite);
+      s->a  = stage1_convoy[s->path_state].a;
+      s->a += stage1_convoy[s->path_state].r; // rotate
+      s->x += isin[(64 + s->a) & 255]; // cosine
+      s->y -= isin[      s->a  & 255]; // sine
+      c2.sprite_link_content(s->shape + s->a / 64, s->sprite);
       c2.Sprite[s->sprite]->x = s->x / FPSCALE;
       c2.Sprite[s->sprite]->y = s->y / FPSCALE;
     }
