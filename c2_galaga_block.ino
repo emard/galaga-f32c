@@ -37,14 +37,18 @@ struct path_segment
 
 struct path_segment stage1_convoy[] =
 {
-  {FPSCALE,   0+32, 100 }, // right 100 frames
-  {FPSCALE,  64+32, 100 }, // up 100 fames
-  {FPSCALE, 128+32, 100 }, // left 100 fames
-  {FPSCALE, 192+32, 100 }, // down 100 fames 
-  {FPSCALE,   0+32,  50 }, // right 50 frames
-  {FPSCALE,  64+32,  50 }, // up 50 fames
-  {FPSCALE, 128+32,  50 }, // left 50 fames
-  {FPSCALE, 192+32,  50 }, // down 50 fames 
+  {FPSCALE,   0, 100 }, // right 100 frames
+  {FPSCALE,  64, 100 }, // up 100 fames
+  {FPSCALE, 128, 100 }, // left 100 fames
+  {FPSCALE, 192, 100 }, // down 100 fames 
+  {FPSCALE,   0,  50 }, // right 50 frames
+  {FPSCALE,  32,  50 }, // right 50 frames
+  {FPSCALE,  64,  50 }, // up 50 fames
+  {FPSCALE,  96,  50 }, // up 50 fames
+  {FPSCALE, 128,  50 }, // left 50 fames
+  {FPSCALE, 160,  50 }, // left 50 fames
+  {FPSCALE, 192,  50 }, // down 50 fames 
+  {FPSCALE, 224,  50 }, // down 50 fames 
   {0,0,0} // end
 };
 
