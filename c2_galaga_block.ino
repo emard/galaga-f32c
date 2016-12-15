@@ -13,7 +13,8 @@
 // fixed point scale
 #define FPSCALE 256
 
-#define SPEED 2
+// global speed 1/2/4/8
+#define SPEED 8
 
 Compositing c2;
 
@@ -58,12 +59,12 @@ struct path_segment stage1_convoy[] =
 
 struct path_segment stage2_convoy[] =
 {
-  {SPEED*FPSCALE,   8, 0, 128/SPEED }, // right slightly up 150 frames
-  {SPEED*FPSCALE,   0, 4, 256/SPEED }, // left circle 256 frames
-  {SPEED*FPSCALE,   8, 0, 128/SPEED }, // right slightly up 150 frames
-  {SPEED*FPSCALE,   0,-4, 256/SPEED }, // right circle 256 frames
-  {SPEED*FPSCALE,   0, 4, 256/SPEED }, // left circle 256 frames
-  {SPEED*FPSCALE,   0,-4, 256/SPEED }, // right circle 256 frames
+  {SPEED*FPSCALE,   8, 0,     128/SPEED }, // right slightly up 150 frames
+  {SPEED*FPSCALE,   0, SPEED, 256/SPEED }, // left circle 256 frames
+  {SPEED*FPSCALE,   8, 0,     128/SPEED }, // right slightly up 150 frames
+  {SPEED*FPSCALE,   0,-SPEED, 256/SPEED }, // right circle 256 frames
+  {SPEED*FPSCALE,   0, SPEED, 256/SPEED }, // left circle 256 frames
+  {SPEED*FPSCALE,   0,-SPEED, 256/SPEED }, // right circle 256 frames
   {0,0,0} // end
 };
 
