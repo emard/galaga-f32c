@@ -123,7 +123,7 @@ void create_ships()
     Starship[i].state = S_ALIEN1_PREPARE;
     Starship[i].prepare = 24*i/SPEED;
     Starship[i].sprite = 32+i;
-    Starship[i].shape = 3*4; // shape base, added rotation 0-3
+    Starship[i].shape = (i&3)*4; // shape base, added rotation 0-3
     Starship[i].path_type = path_type; // type 0 path
     Starship[i].a = path[0].a;
     Starship[i].path_state = 0;
