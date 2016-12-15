@@ -70,6 +70,7 @@ struct starship
   int x,y; // current coordinates of this starship (x256)
   int state; // the state number
   int sprite; // sprite number which is used to display this starship
+  int shape; // sprite base carrying the shape
   int path_type; // current path type
   int path_state; // state of the current path
   int path_count; // frame countdown until next path state
@@ -90,7 +91,8 @@ void create_ships()
   Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
   Starship[0].x = 320*FPSCALE;
   Starship[0].y = 200*FPSCALE;
-  Starship[0].sprite = 0;
+  Starship[0].sprite = 32;
+  Starship[0].shape = 0; // shape base
   Starship[0].path_state = 0;
   Starship[0].path_count = 100;
 }
@@ -99,11 +101,14 @@ void create_ships()
 void ship_frame(struct starship *s)
 {
   int v;
+  uint8_t a; // angle
   if( s->path_count )
   {
     s->path_count--;
-    s->x += isin[(64 + stage1_convoy[s->path_state].a) & 255]; // cosine
-    s->y -= isin[      stage1_convoy[s->path_state].a  & 255]; // sine
+    a = stage1_convoy[s->path_state].a;
+    s->x += isin[(64 + a) & 255]; // cosine
+    s->y -= isin[      a  & 255]; // sine
+    c2.sprite_link_content(s->shape + a / 64, s->sprite);
     c2.Sprite[s->sprite]->x = s->x / FPSCALE;
     c2.Sprite[s->sprite]->y = s->y / FPSCALE;
   }
@@ -112,9 +117,11 @@ void ship_frame(struct starship *s)
     if( stage1_convoy[s->path_state+1].n > 0 )
     {
       s->path_state++;
+      a = stage1_convoy[s->path_state].a;
       s->path_count = stage1_convoy[s->path_state].n;
-      s->x += isin[(64 + stage1_convoy[s->path_state].a) & 255]; // cosine
-      s->y -= isin[      stage1_convoy[s->path_state].a  & 255]; // sine
+      s->x += isin[(64 + a) & 255]; // cosine
+      s->y -= isin[      a  & 255]; // sine
+      c2.sprite_link_content(s->shape + a / 64, s->sprite);
       c2.Sprite[s->sprite]->x = s->x / FPSCALE;
       c2.Sprite[s->sprite]->y = s->y / FPSCALE;
     }
@@ -145,6 +152,8 @@ void setup()
     }
   #endif
 
+  c2.sprite_link_content(17, 32);
+
   if(1)
   {
   // enable video fetching after all the
@@ -169,10 +178,11 @@ void loop()
 
   ship_frame( &(Starship[0]) );
 
+  if(0)
   for(i = 0; i < c2.n_sprites; i++)
   {
-    //c2.Sprite[i]->x += Sprite_speed[i].x;
-    //c2.Sprite[i]->y += Sprite_speed[i].y;
+    c2.Sprite[i]->x += Sprite_speed[i].x;
+    c2.Sprite[i]->y += Sprite_speed[i].y;
     if(c2.Sprite[i]->x < -40)
     {
       Sprite_speed[i].x = 1;
