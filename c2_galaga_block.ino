@@ -92,7 +92,7 @@ void create_ships()
   Starship[0].x = 320*FPSCALE;
   Starship[0].y = 200*FPSCALE;
   Starship[0].sprite = 32;
-  Starship[0].shape = 0; // shape base
+  Starship[0].shape = 3*4; // shape base
   Starship[0].path_state = 0;
   Starship[0].path_count = 100;
 }
@@ -141,7 +141,8 @@ void setup()
     for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
       c2.shape_to_sprite(&Shape[i]);
     for(i = c2.n_sprites; i < c2.sprite_max; i++)
-      c2.sprite_clone(i%N_SHAPES);
+      c2.sprite_clone(20); // sprite big enough to allow reshaping with smaller ones
+      // c2.sprite_clone(i%N_SHAPES);
     for(i = 0; i < c2.n_sprites; i++)
     {
       //shape_to_sprite(1 + (i % 3),i);
@@ -151,8 +152,6 @@ void setup()
       Sprite_speed[i].y = (rand() % 3)-1;
     }
   #endif
-
-  c2.sprite_link_content(17, 32);
 
   if(1)
   {
