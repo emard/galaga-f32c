@@ -602,16 +602,17 @@ struct shape Shape[] =
  [16] = { std_colors, shape_alien_radiate1 },
  [17] = { std_colors, shape_alien_radiate2 },
 
- [18] = { std_colors, shape_missile1 },
- [19] = { std_colors, shape_missile2 },
- [20] = { std_colors, shape_missile3 },
- [21] = { std_colors, shape_missile4 },
+ [18] = { std_colors, shape_explode1 },
+ [19] = { std_colors, shape_explode2 },
 
- [22] = { std_colors, shape_ship1 },
- [23] = { std_colors, shape_ship2 },
+ [20] = { std_colors, shape_missile1 },
+ [21] = { std_colors, shape_missile2 },
+ [22] = { std_colors, shape_missile3 },
+ [23] = { std_colors, shape_missile4 },
 
- [24] = { std_colors, shape_explode1 },
- [25] = { std_colors, shape_explode2 },
+ [24] = { std_colors, shape_ship1 },
+ [25] = { std_colors, shape_ship2 },
+
  [26] = { std_colors, shape_bomb },
  [27] = { std_colors, shape_placeholder },
 
