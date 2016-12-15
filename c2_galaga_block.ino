@@ -49,6 +49,14 @@ struct path_segment stage1_convoy[] =
   {FPSCALE, 160,  50 }, // left 50 fames
   {FPSCALE, 192,  50 }, // down 50 fames 
   {FPSCALE, 224,  50 }, // down 50 fames 
+  {FPSCALE,   0,  50 }, // right 50 frames
+  {FPSCALE,  32,  50 }, // right 50 frames
+  {FPSCALE,  64,  50 }, // up 50 fames
+  {FPSCALE,  96,  50 }, // up 50 fames
+  {FPSCALE, 128,  50 }, // left 50 fames
+  {FPSCALE, 160,  50 }, // left 50 fames
+  {FPSCALE, 192,  50 }, // down 50 fames 
+  {FPSCALE, 224,  50 }, // down 50 fames 
   {0,0,0} // end
 };
 
@@ -141,13 +149,15 @@ void setup()
     for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
       c2.shape_to_sprite(&Shape[i]);
     for(i = c2.n_sprites; i < c2.sprite_max; i++)
-      c2.sprite_clone(20); // sprite big enough to allow reshaping with smaller ones
+      c2.sprite_clone(27); // sprite big enough to allow reshaping with smaller ones
       // c2.sprite_clone(i%N_SHAPES);
     for(i = 0; i < c2.n_sprites; i++)
     {
       //shape_to_sprite(1 + (i % 3),i);
-      c2.Sprite[i]->x = 20 + (rand() % 600);
-      c2.Sprite[i]->y = 20 + (rand() % 400);
+      //c2.Sprite[i]->x = 20 + (rand() % 600);
+      //c2.Sprite[i]->y = 20 + (rand() % 400);
+      c2.Sprite[i]->x = 0 + 44*(i&1);
+      c2.Sprite[i]->y = 0 + 18*i;
       Sprite_speed[i].x = (rand() % 3)-1;
       Sprite_speed[i].y = (rand() % 3)-1;
     }
