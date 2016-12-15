@@ -156,7 +156,7 @@ void setup()
       //shape_to_sprite(1 + (i % 3),i);
       //c2.Sprite[i]->x = 20 + (rand() % 600);
       //c2.Sprite[i]->y = 20 + (rand() % 400);
-      c2.Sprite[i]->x = 0 + 44*(i&1);
+      c2.Sprite[i]->x = 0 + 40*(i&3);
       c2.Sprite[i]->y = 0 + 18*i;
       Sprite_speed[i].x = (rand() % 3)-1;
       Sprite_speed[i].y = (rand() % 3)-1;
