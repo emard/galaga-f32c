@@ -14,7 +14,7 @@
 #define FPSCALE 256
 
 // global speed 1/2/4/8
-#define SPEED 8
+#define SPEED 4
 
 Compositing c2;
 
@@ -87,6 +87,7 @@ struct starship
   int x,y; // current coordinates of this starship (x256)
   uint8_t a; // current angle of movement
   int state; // the state number
+  int prepare; // prepare countdown
   int sprite; // sprite number which is used to display this starship
   int shape; // sprite base carrying the shape
   int path_type; // current path type
@@ -117,9 +118,10 @@ void create_ships()
 
   for(i = 0; i < 8; i++)
   {
-    Starship[i].x = (160+24*i)*FPSCALE;
+    Starship[i].x = (160+0*i)*FPSCALE;
     Starship[i].y = 240*FPSCALE;
-    Starship[i].state = S_ALIEN1_CONVOY;
+    Starship[i].state = S_ALIEN1_PREPARE;
+    Starship[i].prepare = 24*i/SPEED;
     Starship[i].sprite = 32+i;
     Starship[i].shape = 3*4; // shape base, added rotation 0-3
     Starship[i].path_type = path_type; // type 0 path
@@ -130,13 +132,11 @@ void create_ships()
 }
 
 // calculate next frame x y for the starship
-void ship_frame(struct starship *s)
+void ship_convoy(struct starship *s)
 {
   int v;
   struct path_segment *path;
   path = Path_types[s->path_type].path;
-  if(s->state == S_NONE)
-    return;
   v = path[s->path_state].v;
   if( s->path_count )
   {
@@ -163,6 +163,24 @@ void ship_frame(struct starship *s)
       c2.Sprite[s->sprite]->y = s->y / FPSCALE;
     }
   }
+}
+
+void ship_prepare(struct starship *s)
+{
+  if(s->prepare > 0)
+    s->prepare--;
+  else
+    s->state = S_ALIEN1_CONVOY;
+}
+
+void ship_frame(struct starship *s)
+{
+  if(s->state == S_NONE)
+    return;
+  if(s->state == S_ALIEN1_PREPARE)
+    ship_prepare(s);
+  if(s->state == S_ALIEN1_CONVOY)
+    ship_convoy(s);
 }
 
 void setup()
