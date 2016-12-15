@@ -437,7 +437,7 @@ char *shape_bomb[] =
 NULL
 };
 
-char *shape_missile[] =
+char *shape_missile1[] =
 {
 " WW ",
 "  WW",
@@ -450,6 +450,54 @@ char *shape_missile[] =
 " WW ",
 "  WW",
 " WW ",
+NULL
+};
+
+char *shape_missile2[] =
+{
+"  WW",
+" WW ",
+"WW  ",
+" WW ",
+"  WW",
+" WW ",
+"WW  ",
+" WW ",
+"  WW",
+" WW ",
+"WW  ",
+NULL
+};
+
+char *shape_missile3[] =
+{
+" WW ",
+"WW  ",
+" WW ",
+"  WW",
+" WW ",
+"WW  ",
+" WW ",
+"  WW",
+" WW ",
+"WW  ",
+" WW ",
+NULL
+};
+
+char *shape_missile4[] =
+{
+"WW  ",
+" WW ",
+"  WW",
+" WW ",
+"WW  ",
+" WW ",
+"  WW",
+" WW ",
+"WW  ",
+" WW ",
+"  WW",
 NULL
 };
 
@@ -517,14 +565,18 @@ struct shape Shape[] =
  [14] = { std_colors, shape_alien4l },
  [15] = { std_colors, shape_alien4d },
 
- [16] = { std_colors, shape_alien_radiate1 },
- [17] = { std_colors, shape_alien_radiate2 },
- [18] = { std_colors, shape_explode1 },
- [19] = { std_colors, shape_explode2 },
- [20] = { std_colors, shape_bomb },
- [21] = { std_colors, shape_missile },
- [22] = { std_colors, shape_ship1 },
- [23] = { std_colors, shape_ship2 },
+ [16] = { std_colors, shape_missile1 },
+ [17] = { std_colors, shape_missile2 },
+ [18] = { std_colors, shape_missile3 },
+ [19] = { std_colors, shape_missile4 },
+
+ [20] = { std_colors, shape_alien_radiate1 },
+ [21] = { std_colors, shape_alien_radiate2 },
+ [22] = { std_colors, shape_explode1 },
+ [23] = { std_colors, shape_explode2 },
+ [24] = { std_colors, shape_bomb },
+ [25] = { std_colors, shape_ship1 },
+ [26] = { std_colors, shape_ship2 },
 //  [99] = { NULL, NULL }
 };
 
