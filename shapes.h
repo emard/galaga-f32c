@@ -10,6 +10,7 @@ struct charcolors std_colors[] =
   {'C', RGB2PIXEL(0x00FFFF)}, // cyan
   {'G', RGB2PIXEL(0x00FF00)}, // green
   {'B', RGB2PIXEL(0x0000FF)}, // blue
+  {'V', RGB2PIXEL(0xFF00FF)}, // violett
   {'W', RGB2PIXEL(0xFFFFFF)}, // white
   {' ', RGB2PIXEL(0)}, // transparent
   {0, 0}
@@ -543,6 +544,39 @@ char *shape_ship2[] =
 NULL
 };
 
+char *shape_placeholder[] =
+{
+"RRRR",
+"OOOO",
+"YYYY",
+"GGGG",
+"CCCC",
+"BBBB",
+"VVVV",
+"RRRR",
+"OOOO",
+"YYYY",
+"GGGG",
+"CCCC",
+"BBBB",
+"VVVV",
+"RRRR",
+"OOOO",
+"YYYY",
+"GGGG",
+"CCCC",
+"BBBB",
+"VVVV",
+"RRRR",
+"OOOO",
+"YYYY",
+"GGGG",
+"CCCC",
+"BBBB",
+"VVVV",
+NULL
+};
+
 struct shape Shape[] =
 {
   [0] = { std_colors, shape_alien1r },
@@ -565,18 +599,22 @@ struct shape Shape[] =
  [14] = { std_colors, shape_alien4l },
  [15] = { std_colors, shape_alien4d },
 
- [16] = { std_colors, shape_missile1 },
- [17] = { std_colors, shape_missile2 },
- [18] = { std_colors, shape_missile3 },
- [19] = { std_colors, shape_missile4 },
+ [16] = { std_colors, shape_alien_radiate1 },
+ [17] = { std_colors, shape_alien_radiate2 },
 
- [20] = { std_colors, shape_alien_radiate1 },
- [21] = { std_colors, shape_alien_radiate2 },
- [22] = { std_colors, shape_explode1 },
- [23] = { std_colors, shape_explode2 },
- [24] = { std_colors, shape_bomb },
- [25] = { std_colors, shape_ship1 },
- [26] = { std_colors, shape_ship2 },
+ [18] = { std_colors, shape_missile1 },
+ [19] = { std_colors, shape_missile2 },
+ [20] = { std_colors, shape_missile3 },
+ [21] = { std_colors, shape_missile4 },
+
+ [22] = { std_colors, shape_ship1 },
+ [23] = { std_colors, shape_ship2 },
+
+ [24] = { std_colors, shape_explode1 },
+ [25] = { std_colors, shape_explode2 },
+ [26] = { std_colors, shape_bomb },
+ [27] = { std_colors, shape_placeholder },
+
 //  [99] = { NULL, NULL }
 };
 
