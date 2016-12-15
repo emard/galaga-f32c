@@ -13,6 +13,8 @@
 // fixed point scale
 #define FPSCALE 256
 
+#define SPEED 2
+
 Compositing c2;
 
 struct sprite_speed 
@@ -56,12 +58,12 @@ struct path_segment stage1_convoy[] =
 
 struct path_segment stage2_convoy[] =
 {
-  {FPSCALE,   8, 0, 128 }, // right slightly up 150 frames
-  {FPSCALE,   0, 1, 256 }, // left circle 256 frames
-  {FPSCALE,   8, 0, 128 }, // right slightly up 150 frames
-  {FPSCALE,   0,-1, 256 }, // right circle 256 frames
-  {FPSCALE,   0, 1, 256 }, // left circle 256 frames
-  {FPSCALE,   0,-1, 256 }, // right circle 256 frames
+  {SPEED*FPSCALE,   8, 0, 128/SPEED }, // right slightly up 150 frames
+  {SPEED*FPSCALE,   0, 4, 256/SPEED }, // left circle 256 frames
+  {SPEED*FPSCALE,   8, 0, 128/SPEED }, // right slightly up 150 frames
+  {SPEED*FPSCALE,   0,-4, 256/SPEED }, // right circle 256 frames
+  {SPEED*FPSCALE,   0, 4, 256/SPEED }, // left circle 256 frames
+  {SPEED*FPSCALE,   0,-4, 256/SPEED }, // right circle 256 frames
   {0,0,0} // end
 };
 
@@ -134,12 +136,13 @@ void ship_frame(struct starship *s)
   path = Path_types[s->path_type].path;
   if(s->state == S_NONE)
     return;
+  v = path[s->path_state].v;
   if( s->path_count )
   {
     s->path_count--;
     c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-    s->x += isin[(64 + s->a) & 255]; // cos
-    s->y -= isin[      s->a  & 255]; // sin
+    s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
+    s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
     s->a += path[s->path_state].r; // rotate
     c2.Sprite[s->sprite]->x = s->x / FPSCALE;
     c2.Sprite[s->sprite]->y = s->y / FPSCALE;
@@ -152,8 +155,8 @@ void ship_frame(struct starship *s)
       s->path_count = path[s->path_state].n;
       s->a  = path[s->path_state].a;
       c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-      s->x += isin[(64 + s->a) & 255]; // cos
-      s->y -= isin[      s->a  & 255]; // sin
+      s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
+      s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
       s->a += path[s->path_state].r; // rotate
       c2.Sprite[s->sprite]->x = s->x / FPSCALE;
       c2.Sprite[s->sprite]->y = s->y / FPSCALE;
