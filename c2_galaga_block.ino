@@ -18,12 +18,6 @@
 
 Compositing c2;
 
-struct sprite_speed 
-{
-  int x,y;
-};
-struct sprite_speed *Sprite_speed;
-
 // starship states
 enum 
 { 
@@ -57,14 +51,25 @@ struct path_segment stage1_convoy[] =
   {0,0,0} // end
 };
 
-struct path_segment stage2_convoy[] =
+struct path_segment stage2_convoy_left[] =
 {
-  {SPEED*FPSCALE,   8, 0,     128/SPEED }, // right slightly up 150 frames
+  {SPEED*FPSCALE,   8, 0,     128/SPEED }, // right slightly up 128 frames
   {SPEED*FPSCALE,   0, SPEED, 256/SPEED }, // left circle 256 frames
-  {SPEED*FPSCALE,   8, 0,     128/SPEED }, // right slightly up 150 frames
+  {SPEED*FPSCALE,   8, 0,     128/SPEED }, // right slightly up 128 frames
   {SPEED*FPSCALE,   0,-SPEED, 256/SPEED }, // right circle 256 frames
   {SPEED*FPSCALE,   0, SPEED, 256/SPEED }, // left circle 256 frames
   {SPEED*FPSCALE,   0,-SPEED, 256/SPEED }, // right circle 256 frames
+  {0,0,0} // end
+};
+
+struct path_segment stage2_convoy_right[] =
+{
+  {SPEED*FPSCALE,  120, 0,     128/SPEED }, // right slightly up 128 frames
+  {SPEED*FPSCALE,  128,-SPEED, 256/SPEED }, // left circle 256 frames
+  {SPEED*FPSCALE,  120, 0,     128/SPEED }, // right slightly up 128 frames
+  {SPEED*FPSCALE,  128, SPEED, 256/SPEED }, // right circle 256 frames
+  {SPEED*FPSCALE,  128,-SPEED, 256/SPEED }, // left circle 256 frames
+  {SPEED*FPSCALE,  128, SPEED, 256/SPEED }, // right circle 256 frames
   {0,0,0} // end
 };
 
@@ -76,7 +81,8 @@ struct path_types
 struct path_types Path_types[] =
 {
   [0] = {stage1_convoy},
-  [1] = {stage2_convoy},
+  [1] = {stage2_convoy_left},
+  [2] = {stage2_convoy_right},
   {NULL}
 };
 
@@ -108,20 +114,37 @@ void create_sine_table()
 void create_ships()
 {
   int i;
-  int path_type = 1;
+  int path_type;
   struct path_segment *path;
-  path = Path_types[path_type].path;
   Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
 
   for(i = 0; i < SHIPS_MAX; i++)
     Starship[i].state = S_NONE;
 
+  path_type=1;
+  path = Path_types[path_type].path;
   for(i = 0; i < 8; i++)
   {
-    Starship[i].x = (160+0*i)*FPSCALE;
+    Starship[i].x = (160+0*i)*FPSCALE; // left
     Starship[i].y = 240*FPSCALE;
     Starship[i].state = S_ALIEN1_PREPARE;
     Starship[i].prepare = 24*i/SPEED;
+    Starship[i].sprite = 32+i;
+    Starship[i].shape = (i&3)*4; // shape base, added rotation 0-3
+    Starship[i].path_type = path_type; // type 0 path
+    Starship[i].a = path[0].a;
+    Starship[i].path_state = 0;
+    Starship[i].path_count = path[0].n;
+  }
+
+  path_type=2;
+  path = Path_types[path_type].path;
+  for(i = 8; i < 16; i++)
+  {
+    Starship[i].x = (600+0*i)*FPSCALE; // right
+    Starship[i].y = 240*FPSCALE;
+    Starship[i].state = S_ALIEN1_PREPARE;
+    Starship[i].prepare = 24*(i-8)/SPEED;
     Starship[i].sprite = 32+i;
     Starship[i].shape = (i&3)*4; // shape base, added rotation 0-3
     Starship[i].path_type = path_type; // type 0 path
@@ -188,7 +211,6 @@ void setup()
   int i;
   c2.init();
   c2.alloc_sprites(SPRITE_MAX);
-  Sprite_speed = (struct sprite_speed *) malloc(SPRITE_MAX * sizeof(struct sprite_speed));
   create_sine_table();
   create_ships();
 
@@ -196,17 +218,11 @@ void setup()
     for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
       c2.shape_to_sprite(&Shape[i]);
     for(i = c2.n_sprites; i < c2.sprite_max; i++)
-      c2.sprite_clone(27); // sprite big enough to allow reshaping with smaller ones
-      // c2.sprite_clone(i%N_SHAPES);
+      c2.sprite_clone(27); // sprite 27 is big enough to allow reshaping with smaller ones
     for(i = 0; i < c2.n_sprites; i++)
     {
-      //shape_to_sprite(1 + (i % 3),i);
-      //c2.Sprite[i]->x = 20 + (rand() % 600);
-      //c2.Sprite[i]->y = 20 + (rand() % 400);
       c2.Sprite[i]->x = 0 + 40*(i&3);
       c2.Sprite[i]->y = 0 + 18*i;
-      Sprite_speed[i].x = (rand() % 3)-1;
-      Sprite_speed[i].y = (rand() % 3)-1;
     }
   #endif
 
@@ -235,31 +251,6 @@ void loop()
   for(i = 0; i < SHIPS_MAX; i++)
     ship_frame( &(Starship[i]) );
 
-  if(0)
-  for(i = 0; i < c2.n_sprites; i++)
-  {
-    c2.Sprite[i]->x += Sprite_speed[i].x;
-    c2.Sprite[i]->y += Sprite_speed[i].y;
-    if(c2.Sprite[i]->x < -40)
-    {
-      Sprite_speed[i].x = 1;
-      if( (rand()&7) == 0 )
-        Sprite_speed[i].y = (rand()%3)-1;
-    }
-    if(c2.Sprite[i]->x > VGA_X_MAX)
-    {
-      Sprite_speed[i].x = -1;
-    }
-
-    if(c2.Sprite[i]->y < -40)
-    {
-      Sprite_speed[i].y = 1;
-      if( (rand()&7) == 0 )
-        Sprite_speed[i].x = (rand()%3)-1;
-    }
-    if(c2.Sprite[i]->y > VGA_Y_MAX+40)
-      Sprite_speed[i].y = -1;
-  }
   while((*c2.vblank_reg & 0x80) == 0);
   c2.sprite_refresh();
   while((*c2.vblank_reg & 0x80) != 0);
