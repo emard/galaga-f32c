@@ -439,18 +439,18 @@ NULL
 
 char *shape_missile[] =
 {
-"WW",
-"WW",
-"WW",
-"WW",
-"WW",
-"WW",
-"WW",
-"WW",
-"WW",
-"WW",
-"WW",
-"WW",
+" WW ",
+" WW ",
+" WW ",
+" WW ",
+" WW ",
+" WW ",
+" WW ",
+" WW ",
+" WW ",
+" WW ",
+" WW ",
+" WW ",
 NULL
 };
 
