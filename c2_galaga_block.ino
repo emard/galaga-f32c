@@ -53,6 +53,17 @@ struct path_segment stage1_convoy[] =
   {0,0,0} // end
 };
 
+struct path_segment stage2_convoy[] =
+{
+  {FPSCALE,   8, 0, 128 }, // right slightly up 150 frames
+  {FPSCALE,   0, 1, 256 }, // left circle 256 frames
+  {FPSCALE,   8, 0, 128 }, // right slightly up 150 frames
+  {FPSCALE,   0,-1, 256 }, // right circle 256 frames
+  {FPSCALE,   0, 1, 256 }, // left circle 256 frames
+  {FPSCALE,   0,-1, 256 }, // right circle 256 frames
+  {0,0,0} // end
+};
+
 struct path_types
 {
   struct path_segment *path;
@@ -60,8 +71,9 @@ struct path_types
 
 struct path_types Path_types[] =
 {
-  stage1_convoy,
-  NULL
+  [0] = {stage1_convoy},
+  [1] = {stage2_convoy},
+  {NULL}
 };
 
 int *isin; // sine table for angles 0-255
@@ -90,12 +102,16 @@ void create_sine_table()
 
 void create_ships()
 {
+  int path_type = 1;
+  struct path_segment *path;
   Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
-  Starship[0].x = 320*FPSCALE;
-  Starship[0].y = 200*FPSCALE;
-  Starship[0].a = 0;
+  Starship[0].x = 200*FPSCALE;
+  Starship[0].y = 240*FPSCALE;
   Starship[0].sprite = 32;
-  Starship[0].shape = 3*4; // shape base
+  Starship[0].shape = 3*4; // shape base, added rotation 0-3
+  Starship[0].path_type = path_type; // type 0 path
+  path = Path_types[path_type].path;
+  Starship[0].a = path[0].a;
   Starship[0].path_state = 0;
   Starship[0].path_count = 100;
 }
@@ -104,28 +120,29 @@ void create_ships()
 void ship_frame(struct starship *s)
 {
   int v;
-  // uint8_t a; // angle
+  struct path_segment *path;
+  path = Path_types[s->path_type].path;
   if( s->path_count )
   {
     s->path_count--;
-    s->a += stage1_convoy[s->path_state].r; // rotate
-    s->x += isin[(64 + s->a) & 255]; // cosine
-    s->y -= isin[      s->a  & 255]; // sine
-    c2.sprite_link_content(s->shape + s->a / 64, s->sprite);
+    c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+    s->x += isin[(64 + s->a) & 255]; // cos
+    s->y -= isin[      s->a  & 255]; // sin
+    s->a += path[s->path_state].r; // rotate
     c2.Sprite[s->sprite]->x = s->x / FPSCALE;
     c2.Sprite[s->sprite]->y = s->y / FPSCALE;
   }
   else
   {
-    if( stage1_convoy[s->path_state+1].n > 0 )
+    if( path[s->path_state+1].n > 0 )
     {
       s->path_state++;
-      s->path_count = stage1_convoy[s->path_state].n;
-      s->a  = stage1_convoy[s->path_state].a;
-      s->a += stage1_convoy[s->path_state].r; // rotate
-      s->x += isin[(64 + s->a) & 255]; // cosine
-      s->y -= isin[      s->a  & 255]; // sine
-      c2.sprite_link_content(s->shape + s->a / 64, s->sprite);
+      s->path_count = path[s->path_state].n;
+      s->a  = path[s->path_state].a;
+      c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+      s->x += isin[(64 + s->a) & 255]; // cos
+      s->y -= isin[      s->a  & 255]; // sin
+      s->a += path[s->path_state].r; // rotate
       c2.Sprite[s->sprite]->x = s->x / FPSCALE;
       c2.Sprite[s->sprite]->y = s->y / FPSCALE;
     }
