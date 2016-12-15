@@ -15,47 +15,6 @@ struct charcolors std_colors[] =
   {0, 0}
 };
 
-char *shape_ship1[] =
-{
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"WWWW    WWWW",
-"WWWW    WWWW",
-"WWWW    WWWW",
-"WWWW    WWWW",
-NULL
-};
-
-char *shape_ship2[] =
-{
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"WWWW    WWWW    WWWW",
-"WWWW    WWWW    WWWW",
-"WWWW    WWWW    WWWW",
-"WWWW    WWWW    WWWW",
-NULL
-};
 
 char *shape_alien1u[] =
 {
@@ -427,6 +386,47 @@ char *shape_alien_radiate2[] =
 NULL
 };
 
+char *shape_explode1[] =
+{
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+NULL
+};
+
+char *shape_explode2[] =
+{
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"    ",
+"    ",
+"    ",
+"    ",
+"WWWW            WWWW",
+"WWWW            WWWW",
+"WWWW            WWWW",
+"WWWW            WWWW",
+"    ",
+"    ",
+"    ",
+"    ",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+NULL
+};
 
 char *shape_bomb[] =
 {
@@ -439,14 +439,60 @@ NULL
 
 char *shape_missile[] =
 {
-"WWWW",
-"WWWW",
-"WWWW",
-"WWWW",
-"WWWW",
-"WWWW",
-"WWWW",
-"WWWW",
+"WW",
+"WW",
+"WW",
+"WW",
+"WW",
+"WW",
+"WW",
+"WW",
+"WW",
+"WW",
+"WW",
+"WW",
+NULL
+};
+
+char *shape_ship1[] =
+{
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+NULL
+};
+
+char *shape_ship2[] =
+{
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"WWWW    WWWW    WWWW",
+"WWWW    WWWW    WWWW",
+"WWWW    WWWW    WWWW",
+"WWWW    WWWW    WWWW",
 NULL
 };
 
@@ -470,10 +516,12 @@ struct shape Shape[] =
  [15] = { std_colors, shape_alien4r },
  [16] = { std_colors, shape_alien_radiate1 },
  [17] = { std_colors, shape_alien_radiate2 },
- [18] = { std_colors, shape_bomb },
- [19] = { std_colors, shape_missile },
- [20] = { std_colors, shape_ship1 },
- [21] = { std_colors, shape_ship2 },
+ [18] = { std_colors, shape_explode1 },
+ [19] = { std_colors, shape_explode2 },
+ [20] = { std_colors, shape_bomb },
+ [21] = { std_colors, shape_missile },
+ [22] = { std_colors, shape_ship1 },
+ [23] = { std_colors, shape_ship2 },
 //  [99] = { NULL, NULL }
 };
 
