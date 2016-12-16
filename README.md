@@ -26,7 +26,7 @@ until first of them is killed...
 
 # Technical details
 
-On f32c the block graphics is not used, although it could be using
+On f32c the block graphics is not used, although it could be done with
 textmode.
 
 I decided to use c2 sprites with "artwork" that resembles block graphics.
