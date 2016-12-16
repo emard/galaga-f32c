@@ -16,8 +16,11 @@
 // global speed 1/2/4/8
 #define SPEED 4
 
-// ship distance in convoy
-#define SHIP_DISTANCE (24 / SPEED)
+// alien distance in convoy
+#define CONVOY_DISTANCE 24
+
+// alien x-distance in fleet
+#define FLEET_DISTANCE 20
 
 Compositing c2;
 
@@ -25,8 +28,8 @@ Compositing c2;
 enum 
 { 
   S_NONE,
-  S_ALIEN1_PREPARE, S_ALIEN1_CONVOY, S_ALIEN1_HOMING, S_ALIEN1_HOME,
-  S_ALIEN1_ATTACK, S_ALIEN1_EXPLODING, S_ALIEN1_DEAD
+  S_ALIEN_PREPARE, S_ALIEN_CONVOY, S_ALIEN_HOMING, S_ALIEN_HOME,
+  S_ALIEN_ATTACK, S_ALIEN_EXPLODING, S_ALIEN_DEAD
 };
 
 struct path_segment
@@ -137,38 +140,38 @@ struct convoy
 
 struct convoy Convoy1[] =
 {
-    {160,160,  10,20,  1, 1,0 },
-    {160,160,  20,20,  2, 1,0 },
-    {160,160,  30,20,  3, 1,0 },
-    {160,160,  40,20,  4, 1,0 },
-    {160,160,  50,20,  5, 1,0 },
-    {600,160,  60,20,  1, 2,0 },
-    {600,160,  70,20,  2, 2,0 },
-    {600,160,  80,20,  3, 2,0 },
-    {600,160,  60,20,  4, 2,0 },
-    {600,160,  70,20,  5, 2,0 },
+    {160,160,  100+  1*FLEET_DISTANCE,30,  1, 1,0 },
+    {160,160,  100+  2*FLEET_DISTANCE,30,  2, 1,0 },
+    {160,160,  100+  3*FLEET_DISTANCE,30,  3, 1,0 },
+    {160,160,  100+  4*FLEET_DISTANCE,30,  4, 1,0 },
+    {160,160,  100+  5*FLEET_DISTANCE,30,  5, 1,0 },
+    {600,160,  100+  6*FLEET_DISTANCE,30,  1, 2,0 },
+    {600,160,  100+  7*FLEET_DISTANCE,30,  2, 2,0 },
+    {600,160,  100+  8*FLEET_DISTANCE,30,  3, 2,0 },
+    {600,160,  100+  9*FLEET_DISTANCE,30,  4, 2,0 },
+    {600,160,  100+ 10*FLEET_DISTANCE,30,  5, 2,0 },
     {  0,0,     0,0,   0, 0,-1} // end (alien type -1)
 };
 
 struct convoy Convoy_demo[] =
 {
-    {160,160,  10,20,  1, 1,0 },
-    {160,160,  20,20,  2, 1,1 },
-    {160,160,  30,20,  3, 1,2 },
-    {160,160,  40,20,  4, 1,3 },
-    {160,160,  50,20,  5, 1,0 },
-    {160,160,  60,20,  6, 1,1 },
-    {160,160,  70,20,  7, 1,2 },
-    {160,160,  80,20,  8, 1,3 },
+    {160,160,  20,20,  1, 1,0 },
+    {160,160,  40,20,  2, 1,1 },
+    {160,160,  60,20,  3, 1,2 },
+    {160,160,  80,20,  4, 1,3 },
+    {160,160, 100,20,  5, 1,0 },
+    {160,160, 120,20,  6, 1,1 },
+    {160,160, 140,20,  7, 1,2 },
+    {160,160, 160,20,  8, 1,3 },
 
-    {600,160,  90,20,  1, 2,0 },
-    {600,160, 100,20,  2, 2,1 },
-    {600,160, 110,20,  3, 2,2 },
-    {600,160, 120,20,  4, 2,3 },
-    {600,160, 130,20,  5, 2,0 },
-    {600,160, 140,20,  6, 2,1 },
-    {600,160, 150,20,  7, 2,2 },
-    {600,160, 160,20,  8, 2,3 },
+    {600,160, 180,20,  1, 2,0 },
+    {600,160, 200,20,  2, 2,1 },
+    {600,160, 220,20,  3, 2,2 },
+    {600,160, 240,20,  4, 2,3 },
+    {600,160, 260,20,  5, 2,0 },
+    {600,160, 280,20,  6, 2,1 },
+    {600,160, 300,20,  7, 2,2 },
+    {600,160, 320,20,  8, 2,3 },
 
     {  0,0,     0,0,   0, 0,-1} // end (alien type -1)
 };
@@ -192,17 +195,18 @@ void create_ships()
   for(i = 0; i < SHIPS_MAX; i++)
     Starship[i].state = S_NONE;
 
-  convoy = Convoy_demo;
+  convoy = Convoy1;
   for(i = 0; i < 20; i++)
   {
     if( convoy[i].alien_type == -1)
-      continue; // abort for-loop
+      return;
+      // continue; // abort for-loop
     Starship[i].x = convoy[i].x * FPSCALE; // where it will enter screen
     Starship[i].y = convoy[i].y * FPSCALE;
     Starship[i].hx = convoy[i].hx * FPSCALE; // fleet home position
     Starship[i].hy = convoy[i].hy * FPSCALE;
-    Starship[i].state = S_ALIEN1_PREPARE;
-    Starship[i].prepare = SHIP_DISTANCE*convoy[i].prepare;
+    Starship[i].state = S_ALIEN_PREPARE;
+    Starship[i].prepare = convoy[i].prepare * CONVOY_DISTANCE / SPEED;
     Starship[i].sprite = 40+i;
     Starship[i].shape = (convoy[i].alien_type & 3)*4; // shape base, added rotation 0-3
     Starship[i].path_type = convoy[i].path; // type 0 path
@@ -244,6 +248,15 @@ void ship_convoy(struct starship *s)
       c2.Sprite[s->sprite]->x = s->x / FPSCALE;
       c2.Sprite[s->sprite]->y = s->y / FPSCALE;
     }
+    else
+    {
+      // alien directly to home
+      // FIXME: this is to early, "HOMING" state is skipped
+      s->a = 192; // orient alien down
+      // c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+      c2.sprite_link_content(s->shape + 3, s->sprite); // orient alien down
+      s->state = S_ALIEN_HOME;
+    }
   }
 }
 
@@ -252,17 +265,32 @@ void ship_prepare(struct starship *s)
   if(s->prepare > 0)
     s->prepare--;
   else
-    s->state = S_ALIEN1_CONVOY;
+    s->state = S_ALIEN_CONVOY;
+}
+
+// fly the ship in the fleet
+void ship_fleet(struct starship *s)
+{
+   c2.Sprite[s->sprite]->x = s->hx / FPSCALE;
+   c2.Sprite[s->sprite]->y = s->hy / FPSCALE;
 }
 
 void ship_frame(struct starship *s)
 {
-  if(s->state == S_NONE)
-    return;
-  if(s->state == S_ALIEN1_PREPARE)
-    ship_prepare(s);
-  if(s->state == S_ALIEN1_CONVOY)
-    ship_convoy(s);
+  switch(s->state)
+  {
+    case S_NONE:
+      return;
+    case S_ALIEN_PREPARE:
+      ship_prepare(s);
+      break;
+    case S_ALIEN_CONVOY:
+      ship_convoy(s);
+      break;
+    case S_ALIEN_HOME:
+      ship_fleet(s);
+      break;
+  }
 }
 
 void setup()
