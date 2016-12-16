@@ -73,6 +73,14 @@ struct path_segment stage2_convoy_right[] =
   {0,0,0} // end
 };
 
+/* fleet formation example
+**  4       W  W W  W
+**  6      w w w w w w
+**  8    w w w w w w w w
+** 10  v v v v v v v v v v
+** 10  v v v v v v v v v v
+*/
+
 struct path_types
 {
   struct path_segment *path;
