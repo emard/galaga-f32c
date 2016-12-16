@@ -307,83 +307,55 @@ NULL
 
 char *shape_alien_radiate1[] =
 {
-"                        WWWW",
-"                        WWWW",
-"                        WWWW",
-"                        WWWW",
-"    ",
-"    ",
-"    ",
-"    ",
-"                    WWWWWWWWWWWW",
-"                    WWWWWWWWWWWW",
-"                    WWWWWWWWWWWW",
-"                    WWWWWWWWWWWW",
-"    ",
-"    ",
-"    ",
-"    ",
-"                WWWWWWWWWWWWWWWWWWWW",
-"                WWWWWWWWWWWWWWWWWWWW",
-"                WWWWWWWWWWWWWWWWWWWW",
-"                WWWWWWWWWWWWWWWWWWWW",
-"    ",
-"    ",
-"    ",
-"    ",
-"            WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"            WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"            WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"            WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"    ",
-"    ",
-"    ",
-"    ",
-"        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWW",
+"WWWW",
+"WWWW",
+"WWWW",
 NULL
 };
 
-char *shape_alien_radiate2[] =
+char *shape_alien_radiate3[] =
 {
-"                    WWWWWWWWWWWW",
-"                    WWWWWWWWWWWW",
-"                    WWWWWWWWWWWW",
-"                    WWWWWWWWWWWW",
-"    ",
-"    ",
-"    ",
-"    ",
-"                WWWWWWWWWWWWWWWWWWWW",
-"                WWWWWWWWWWWWWWWWWWWW",
-"                WWWWWWWWWWWWWWWWWWWW",
-"                WWWWWWWWWWWWWWWWWWWW",
-"    ",
-"    ",
-"    ",
-"    ",
-"            WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"            WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"            WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"            WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"    ",
-"    ",
-"    ",
-"    ",
-"        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"        WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"    ",
-"    ",
-"    ",
-"    ",
-"    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-"    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWW",
+"WWWWWWWWWWWW",
+"WWWWWWWWWWWW",
+"WWWWWWWWWWWW",
+NULL
+};
+
+char *shape_alien_radiate5[] =
+{
+"WWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWW",
+NULL
+};
+
+char *shape_alien_radiate7[] =
+{
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+NULL
+};
+
+char *shape_alien_radiate9[] =
+{
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+NULL
+};
+
+char *shape_alien_radiate11[] =
+{
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
 NULL
 };
 
@@ -502,12 +474,8 @@ char *shape_missile4[] =
 NULL
 };
 
-char *shape_ship1[] =
+char *shape_ship1u[] =
 {
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
 "    WWWW",
 "    WWWW",
 "    WWWW",
@@ -523,12 +491,59 @@ char *shape_ship1[] =
 NULL
 };
 
-char *shape_ship2[] =
+char *shape_ship1d[] =
 {
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+NULL
+};
+
+char *shape_ship1l[] =
+{
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"WWWWWWWW",
+"WWWWWWWW",
+"WWWWWWWW",
+"WWWWWWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+NULL
+};
+
+char *shape_ship1r[] =
+{
+"WWWW",
+"WWWW",
+"WWWW",
+"WWWW",
+"    WWWWWWWW",
+"    WWWWWWWW",
+"    WWWWWWWW",
+"    WWWWWWWW",
+"WWWW",
+"WWWW",
+"WWWW",
+"WWWW",
+NULL
+};
+
+char *shape_ship2u[] =
+{
 "    WWWW    WWWW",
 "    WWWW    WWWW",
 "    WWWW    WWWW",
@@ -600,21 +615,28 @@ struct shape Shape[] =
  [15] = { std_colors, shape_alien4d },
 
  [16] = { std_colors, shape_alien_radiate1 },
- [17] = { std_colors, shape_alien_radiate2 },
+ [17] = { std_colors, shape_alien_radiate3 },
+ [18] = { std_colors, shape_alien_radiate5 },
+ [19] = { std_colors, shape_alien_radiate7 },
+ [20] = { std_colors, shape_alien_radiate9 },
+ [21] = { std_colors, shape_alien_radiate11 },
 
- [18] = { std_colors, shape_explode1 },
- [19] = { std_colors, shape_explode2 },
+ [22] = { std_colors, shape_explode1 },
+ [23] = { std_colors, shape_explode2 },
 
- [20] = { std_colors, shape_missile1 },
- [21] = { std_colors, shape_missile2 },
- [22] = { std_colors, shape_missile3 },
- [23] = { std_colors, shape_missile4 },
+ [24] = { std_colors, shape_missile1 },
+ [25] = { std_colors, shape_missile2 },
+ [26] = { std_colors, shape_missile3 },
+ [27] = { std_colors, shape_missile4 },
 
- [24] = { std_colors, shape_ship1 },
- [25] = { std_colors, shape_ship2 },
+ [28] = { std_colors, shape_ship1r },
+ [29] = { std_colors, shape_ship1u },
+ [30] = { std_colors, shape_ship1l },
+ [31] = { std_colors, shape_ship1d },
+ [32] = { std_colors, shape_ship2u },
 
- [26] = { std_colors, shape_bomb },
- [27] = { std_colors, shape_placeholder },
+ [33] = { std_colors, shape_bomb },
+ [34] = { std_colors, shape_placeholder },
 
 //  [99] = { NULL, NULL }
 };
