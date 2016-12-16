@@ -1,0 +1,12 @@
+[ ] adjust center for all shapes
+[ ] multiple level fleet setup struct
+[ ] attacking stage
+[ ] attractive explosions, fireballs
+[ ] collision detection
+[ ] ship missiles
+[ ] alien bombs
+    calculated angle to hit the ship
+[ ] peaceful aliens: they don't shoot until first
+    of them is killed
+[ ] alien abduction for double gun
+
