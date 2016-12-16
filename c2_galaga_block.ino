@@ -145,7 +145,7 @@ void create_ships()
     Starship[i].y = 240*FPSCALE;
     Starship[i].state = S_ALIEN1_PREPARE;
     Starship[i].prepare = 24*i/SPEED;
-    Starship[i].sprite = 32+i;
+    Starship[i].sprite = 40+i;
     Starship[i].shape = (i&3)*4; // shape base, added rotation 0-3
     Starship[i].path_type = path_type; // type 0 path
     Starship[i].a = path[0].a;
@@ -161,7 +161,7 @@ void create_ships()
     Starship[i].y = 240*FPSCALE;
     Starship[i].state = S_ALIEN1_PREPARE;
     Starship[i].prepare = 24*(i-8)/SPEED;
-    Starship[i].sprite = 32+i;
+    Starship[i].sprite = 40+i;
     Starship[i].shape = (i&3)*4; // shape base, added rotation 0-3
     Starship[i].path_type = path_type; // type 0 path
     Starship[i].a = path[0].a;
@@ -234,11 +234,11 @@ void setup()
     for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
       c2.shape_to_sprite(&Shape[i]);
     for(i = c2.n_sprites; i < c2.sprite_max; i++)
-      c2.sprite_clone(27); // sprite 27 is big enough to allow reshaping with smaller ones
+      c2.sprite_clone(34); // sprite 34 is big enough to allow reshaping with smaller ones
     for(i = 0; i < c2.n_sprites; i++)
     {
-      c2.Sprite[i]->x = 0 + 40*(i&3);
-      c2.Sprite[i]->y = 0 + 18*i;
+      c2.Sprite[i]->x = 0 + 32*(i&3);
+      c2.Sprite[i]->y = 0 + 12*i;
     }
   #endif
 
