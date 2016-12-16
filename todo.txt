@@ -9,4 +9,4 @@
 [ ] peaceful aliens: they don't shoot until first
     of them is killed
 [ ] alien abduction for double gun
-
+[ ] alloc new shape (using the free ones)
