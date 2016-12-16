@@ -83,10 +83,12 @@ struct path_segment stage2_convoy_right[] =
 **
 ** 1. v v v v v        v v v v v
 **           /          \
+**           ->        <-
 ** 2.    <- O <- w w w w w w w w
 ** 3. w W w W w w W w W w -> O ->
 ** 4. v v v v v        v v v v v
 **           /          \
+**           ->        <-
 */
 
 struct path_types
