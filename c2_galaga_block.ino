@@ -16,6 +16,9 @@
 // global speed 1/2/4/8
 #define SPEED 4
 
+// ship distance in convoy
+#define SHIP_DISTANCE (24 / SPEED)
+
 Compositing c2;
 
 // starship states
@@ -127,23 +130,46 @@ struct convoy
 {
   int x,y;      // x,y entry point on the screen
   int hx,hy;    // x,y coordinates in fleet
-  int delay;    // time delay of the convoy start
+  int prepare;  // time delay of the alien to prepare for convoy start
   int8_t path;  // convoy path type
   int8_t alien_type; // alien type 0-3, -1 end
 };
 
 struct convoy Convoy1[] =
 {
-    {160,160,  10,20,  0, 1,0 },
-    {160,160,  20,20,  0, 1,0 },
-    {160,160,  30,20,  0, 1,0 },
-    {160,160,  40,20,  0, 1,0 },
-    {160,160,  50,20,  0, 1,0 },
-    {600,160,  60,20,  0, 2,0 },
-    {600,160,  70,20,  0, 2,0 },
-    {600,160,  80,20,  0, 2,0 },
-    {600,160,  60,20,  0, 2,0 },
-    {600,160,  70,20,  0, 2,0 },
+    {160,160,  10,20,  1, 1,0 },
+    {160,160,  20,20,  2, 1,0 },
+    {160,160,  30,20,  3, 1,0 },
+    {160,160,  40,20,  4, 1,0 },
+    {160,160,  50,20,  5, 1,0 },
+    {600,160,  60,20,  1, 2,0 },
+    {600,160,  70,20,  2, 2,0 },
+    {600,160,  80,20,  3, 2,0 },
+    {600,160,  60,20,  4, 2,0 },
+    {600,160,  70,20,  5, 2,0 },
+    {  0,0,     0,0,   0, 0,-1} // end (alien type -1)
+};
+
+struct convoy Convoy_demo[] =
+{
+    {160,160,  10,20,  1, 1,0 },
+    {160,160,  20,20,  2, 1,1 },
+    {160,160,  30,20,  3, 1,2 },
+    {160,160,  40,20,  4, 1,3 },
+    {160,160,  50,20,  5, 1,0 },
+    {160,160,  60,20,  6, 1,1 },
+    {160,160,  70,20,  7, 1,2 },
+    {160,160,  80,20,  8, 1,3 },
+
+    {600,160,  90,20,  1, 2,0 },
+    {600,160, 100,20,  2, 2,1 },
+    {600,160, 110,20,  3, 2,2 },
+    {600,160, 120,20,  4, 2,3 },
+    {600,160, 130,20,  5, 2,0 },
+    {600,160, 140,20,  6, 2,1 },
+    {600,160, 150,20,  7, 2,2 },
+    {600,160, 160,20,  8, 2,3 },
+
     {  0,0,     0,0,   0, 0,-1} // end (alien type -1)
 };
 
@@ -159,39 +185,28 @@ void create_ships()
 {
   int i;
   int path_type;
+  struct convoy *convoy;
   struct path_segment *path;
   Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
 
   for(i = 0; i < SHIPS_MAX; i++)
     Starship[i].state = S_NONE;
 
-  path_type=1;
-  path = Path_types[path_type].path;
-  for(i = 0; i < 8; i++)
+  convoy = Convoy_demo;
+  for(i = 0; i < 20; i++)
   {
-    Starship[i].x = (160+0*i)*FPSCALE; // left
-    Starship[i].y = 240*FPSCALE;
+    if( convoy[i].alien_type == -1)
+      continue; // abort for-loop
+    Starship[i].x = convoy[i].x * FPSCALE; // where it will enter screen
+    Starship[i].y = convoy[i].y * FPSCALE;
+    Starship[i].hx = convoy[i].hx * FPSCALE; // fleet home position
+    Starship[i].hy = convoy[i].hy * FPSCALE;
     Starship[i].state = S_ALIEN1_PREPARE;
-    Starship[i].prepare = 24*i/SPEED;
+    Starship[i].prepare = SHIP_DISTANCE*convoy[i].prepare;
     Starship[i].sprite = 40+i;
-    Starship[i].shape = (i&3)*4; // shape base, added rotation 0-3
-    Starship[i].path_type = path_type; // type 0 path
-    Starship[i].a = path[0].a;
-    Starship[i].path_state = 0;
-    Starship[i].path_count = path[0].n;
-  }
-
-  path_type=2;
-  path = Path_types[path_type].path;
-  for(i = 8; i < 16; i++)
-  {
-    Starship[i].x = (600+0*i)*FPSCALE; // right
-    Starship[i].y = 240*FPSCALE;
-    Starship[i].state = S_ALIEN1_PREPARE;
-    Starship[i].prepare = 24*(i-8)/SPEED;
-    Starship[i].sprite = 40+i;
-    Starship[i].shape = (i&3)*4; // shape base, added rotation 0-3
-    Starship[i].path_type = path_type; // type 0 path
+    Starship[i].shape = (convoy[i].alien_type & 3)*4; // shape base, added rotation 0-3
+    Starship[i].path_type = convoy[i].path; // type 0 path
+    path = Path_types[Starship[i].path_type].path;
     Starship[i].a = path[0].a;
     Starship[i].path_state = 0;
     Starship[i].path_count = path[0].n;
