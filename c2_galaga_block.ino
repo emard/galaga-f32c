@@ -121,6 +121,32 @@ struct starship
 };
 struct starship *Starship;
 
+// defines which members of convoy are to enter the stage
+// their flight path and their position in the fleet
+struct convoy
+{
+  int x,y;      // x,y entry point on the screen
+  int hx,hy;    // x,y coordinates in fleet
+  int delay;    // time delay of the convoy start
+  int8_t path;  // convoy path type
+  int8_t alien_type; // alien type 0-3, -1 end
+};
+
+struct convoy Convoy1[] =
+{
+    {160,160,  10,20,  0, 1,0 },
+    {160,160,  20,20,  0, 1,0 },
+    {160,160,  30,20,  0, 1,0 },
+    {160,160,  40,20,  0, 1,0 },
+    {160,160,  50,20,  0, 1,0 },
+    {600,160,  60,20,  0, 2,0 },
+    {600,160,  70,20,  0, 2,0 },
+    {600,160,  80,20,  0, 2,0 },
+    {600,160,  60,20,  0, 2,0 },
+    {600,160,  70,20,  0, 2,0 },
+    {  0,0,     0,0,   0, 0,-1} // end (alien type -1)
+};
+
 void create_sine_table()
 {
   int i;
