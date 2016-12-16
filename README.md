@@ -31,12 +31,13 @@ textmode.
 
 I decided to use c2 sprites with "artwork" that resembles block graphics.
 
-Sprites are chosen primarily to improve playability in some occasions
+Sprites are chosen primarily to improve playability in situations
 when smooth moving of the sprites can make game more consistent and playable.
 
 For example, aliens can shoot missiles at an angle.
 Original game renders such missile very jerky, and the missiles
-itself are hard to see, so ship gets destroyed without being able to
-properly see the trajctory of the missile. Here sprites will smooth render
-alien fire shot at angle and player can have at least some fair chance to see
-and avoid them.
+are tiny dots, hard to see. Ship can get destroyed without being able to
+properly see the trajctory of incoming missiles. 
+
+Now sprites will smooth render alien fire shots at angle, so player 
+will have more chance to see and avoid them.
