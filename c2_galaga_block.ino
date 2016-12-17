@@ -305,19 +305,49 @@ void ship_prepare(struct starship *s)
 
 void ship_homing(struct starship *s)
 {
-  if(s->x > s->hx)
-    s->x -= SPEED * FPSCALE;
-  if(s->x < s->hx)
-    s->x += SPEED * FPSCALE;
-  if(s->y > s->hy)
-    s->y -= SPEED * FPSCALE;
-  if(s->y < s->hy)
-    s->y += SPEED * FPSCALE;
-  if(s->x == s->hx && s->y == s->hy)
+  int dir;
+  int xd, yd;
+  xd = s->hx - s->x;
+  yd = s->hy - s->y;
+  if(xd > SPEED * FPSCALE)
+  {
+    xd = SPEED * FPSCALE;
+    dir = 0; // right
+  }
+  else
+  {
+    if(xd < -(SPEED * FPSCALE))
+    {
+      xd = -(SPEED * FPSCALE);
+      dir = 2; // left
+    }
+  }
+  if(yd > SPEED * FPSCALE)
+  {
+    yd = SPEED * FPSCALE;
+    dir = 1; // up
+  }
+  else
+  {
+    if(yd < -(SPEED * FPSCALE))
+    {
+      yd = -(SPEED * FPSCALE);
+      dir = 3; // down
+    }
+  }
+  s->x += xd;
+  s->y += yd;
+  if(abs(xd) < FPSCALE/2 && abs(yd) < FPSCALE/2)
+  // if( xd == 0 && yd == 0 )
+  {
     s->state = S_ALIEN_HOME;
-  s->a = 192; // orient alien down
+    s->x = s->hx;
+    s->y = s->hy;
+    dir = 3; // down
+  }
+  s->a = dir * 64; // orient alien down
   // c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-  c2.sprite_link_content(s->shape + 3, s->sprite); // orient alien down
+  c2.sprite_link_content(s->shape + dir, s->sprite); // orient alien down
   c2.Sprite[s->sprite]->x = s->x / FPSCALE;
   c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
@@ -325,8 +355,10 @@ void ship_homing(struct starship *s)
 // fly the ship in the fleet
 void ship_fleet(struct starship *s)
 {
+ #if 0
    c2.Sprite[s->sprite]->x = s->hx / FPSCALE;
    c2.Sprite[s->sprite]->y = s->hy / FPSCALE;
+ #endif
 }
 
 void ship_frame(struct starship *s)
