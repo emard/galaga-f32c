@@ -140,7 +140,7 @@ struct path_types Path_types[] =
 };
 
 int *isin; // sine table for angles 0-255
-int *iatan; // arctan table 0-FPSCALE
+uint8_t *iatan; // arctan table 0-FPSCALE
 
 struct starship
 {
@@ -405,15 +405,51 @@ void ship_homing(struct starship *s)
 }
 
 // calculate bomb angle from alien starship to the player's ship 
-int calc_bomb_angle(struct starship *s)
+// possible angles are within 45 degreen
+// outside of reach - return 0
+uint8_t calc_bomb_angle(struct starship *s)
 {
-  return 192+iatan[FPSCALE/2];
+  int rev = 1;
+  int dx, dy;
+  uint8_t a;
+  int xadjust = 6*FPSCALE, yadjust = 10*FPSCALE; // x,y-adjustment for uncentered sprites
+  int tangent; // tangent value
+  // if ship is above alien, can't shoot
+  if(Ship.y < s->y)
+    return 0;
+  dx = Ship.x + xadjust - s->x;
+  dy = Ship.y + yadjust - s->y;
+  // if ship is left, convert to the right
+  if(dx < 0)
+  {
+    dx = -dx;
+    rev = -1;
+  }
+  // both dx and dy should be positive now
+  // angles > 45 are out of reach
+  if(dx >= dy)
+    return 0;
+  // avoid eventual division by zero
+  if(dy == 0)
+    return 0;
+  // calculate angle (arc-tan)
+  tangent = (dx*FPSCALE)/dy;
+  // sanity check
+  if(tangent < 0 || tangent >= FPSCALE)
+    return 0;
+  a = iatan[tangent];
+  // reverse sign
+  if(rev > 0)
+    return 192 + a;
+  else
+    return 192 - a;
 }
 
 // fly the ship in the fleet
 void ship_fleet(struct starship *s)
 {
   uint16_t rng;
+  uint8_t a;
 
   s->x = Fleet.x + s->hx;
   s->y = Fleet.y + s->hy;
@@ -424,7 +460,11 @@ void ship_fleet(struct starship *s)
   rng = rand();
 
   if(rng < 50)
-    bomb_create(s->x, s->y, calc_bomb_angle(s));
+  {
+    a = calc_bomb_angle(s);
+    if(a != 0)
+      bomb_create(s->x, s->y, a);
+  }
 }
 
 
