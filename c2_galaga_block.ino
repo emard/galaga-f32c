@@ -412,7 +412,7 @@ uint8_t calc_bomb_angle(struct starship *s)
   int rev = 1;
   int dx, dy;
   uint8_t a;
-  int xadjust = 6*FPSCALE, yadjust = 10*FPSCALE; // x,y-adjustment for uncentered sprites
+  int xadjust = 4*FPSCALE, yadjust = 10*FPSCALE; // x,y-adjustment for uncentered sprites
   int tangent; // tangent value
   // if ship is above alien, can't shoot
   if(Ship.y < s->y)
