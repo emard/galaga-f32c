@@ -13,8 +13,11 @@
 // fixed point scale
 #define FPSCALE 256
 
-// global speed 1/2/4/8
-#define SPEED 4
+// global speed 1/2/4/8 (more=faster)
+#define SPEED 1
+
+// fleet drift (more = SLOWER)
+#define FLEET_DRIFT 4
 
 // alien distance in convoy
 #define CONVOY_DISTANCE 24
@@ -30,6 +33,20 @@ enum
   S_NONE,
   S_ALIEN_PREPARE, S_ALIEN_CONVOY, S_ALIEN_HOMING, S_ALIEN_HOME,
   S_ALIEN_ATTACK, S_ALIEN_EXPLODING, S_ALIEN_DEAD
+};
+
+struct fleet
+{
+  int x,y;
+  int xmin,xmax;
+  int xd; // x-direction
+};
+
+struct fleet Fleet =
+{
+  200*FPSCALE,100*FPSCALE, // initial xy
+  100*FPSCALE,300*FPSCALE, // min-max x
+  SPEED*FPSCALE/FLEET_DRIFT // initial x-dir
 };
 
 struct path_segment
@@ -140,47 +157,47 @@ struct convoy
 
 struct convoy Convoy1[] =
 {
-    {160,160,  200+  1*FLEET_DISTANCE,100+3*FLEET_DISTANCE,  1, 1,0 },
-    {160,160,  200+  2*FLEET_DISTANCE,100+3*FLEET_DISTANCE,  2, 1,0 },
-    {160,160,  200+  3*FLEET_DISTANCE,100+3*FLEET_DISTANCE,  3, 1,0 },
-    {160,160,  200+  4*FLEET_DISTANCE,100+3*FLEET_DISTANCE,  4, 1,0 },
-    {160,160,  200+  5*FLEET_DISTANCE,100+3*FLEET_DISTANCE,  5, 1,0 },
-    {600,160,  200+  6*FLEET_DISTANCE,100+3*FLEET_DISTANCE,  1, 2,0 },
-    {600,160,  200+  7*FLEET_DISTANCE,100+3*FLEET_DISTANCE,  2, 2,0 },
-    {600,160,  200+  8*FLEET_DISTANCE,100+3*FLEET_DISTANCE,  3, 2,0 },
-    {600,160,  200+  9*FLEET_DISTANCE,100+3*FLEET_DISTANCE,  4, 2,0 },
-    {600,160,  200+ 10*FLEET_DISTANCE,100+3*FLEET_DISTANCE,  5, 2,0 },
+    {160,160,   1*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 1,0 },
+    {160,160,   2*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 1,0 },
+    {160,160,   3*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 1,0 },
+    {160,160,   4*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 1,0 },
+    {160,160,   5*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 1,0 },
+    {600,160,   6*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 2,0 },
+    {600,160,   7*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 2,0 },
+    {600,160,   8*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 2,0 },
+    {600,160,   9*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 2,0 },
+    {600,160,  10*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 2,0 },
 
-    {600,160,  200+  2*FLEET_DISTANCE,100+2*FLEET_DISTANCE, 50+ 0, 2,1 },
-    {600,160,  200+  3*FLEET_DISTANCE,100+2*FLEET_DISTANCE, 50+ 1, 2,1 },
-    {600,160,  200+  4*FLEET_DISTANCE,100+2*FLEET_DISTANCE, 50+ 2, 2,1 },
-    {600,160,  200+  5*FLEET_DISTANCE,100+2*FLEET_DISTANCE, 50+ 3, 2,1 },
-    {600,160,  200+  6*FLEET_DISTANCE,100+2*FLEET_DISTANCE, 50+ 4, 2,1 },
-    {600,160,  200+  7*FLEET_DISTANCE,100+2*FLEET_DISTANCE, 50+ 5, 2,1 },
-    {600,160,  200+  8*FLEET_DISTANCE,100+2*FLEET_DISTANCE, 50+ 6, 2,1 },
-    {600,160,  200+  9*FLEET_DISTANCE,100+2*FLEET_DISTANCE, 50+ 7, 2,1 },
+    {600,160,   2*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 0, 2,1 },
+    {600,160,   3*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 1, 2,1 },
+    {600,160,   4*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 2, 2,1 },
+    {600,160,   5*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 3, 2,1 },
+    {600,160,   6*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 4, 2,1 },
+    {600,160,   7*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 5, 2,1 },
+    {600,160,   8*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 6, 2,1 },
+    {600,160,   9*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 7, 2,1 },
 
-    {160,160,  200+  3*FLEET_DISTANCE,100+1*FLEET_DISTANCE, 100+ 0, 1,1 },
-    {160,160,  200+  6*FLEET_DISTANCE/2,100+0*FLEET_DISTANCE, 100+ 1, 1,3 },
-    {160,160,  200+  4*FLEET_DISTANCE,100+1*FLEET_DISTANCE, 100+ 2, 1,1 },
-    {160,160,  200+  9*FLEET_DISTANCE/2,100+0*FLEET_DISTANCE, 100+ 3, 1,3 },
-    {160,160,  200+  5*FLEET_DISTANCE,100+1*FLEET_DISTANCE, 100+ 4, 1,1 },
-    {160,160,  200+  6*FLEET_DISTANCE,100+1*FLEET_DISTANCE, 100+ 5, 1,1 },
-    {160,160,  200+ 12*FLEET_DISTANCE/2,100+0*FLEET_DISTANCE, 100+ 6, 1,3 },
-    {160,160,  200+  7*FLEET_DISTANCE,100+1*FLEET_DISTANCE, 100+ 7, 1,1 },
-    {160,160,  200+ 15*FLEET_DISTANCE/2,100+0*FLEET_DISTANCE, 100+ 8, 1,3 },
-    {160,160,  200+  8*FLEET_DISTANCE,100+1*FLEET_DISTANCE, 100+ 9, 1,1 },
+    {160,160,   3*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 0, 1,1 },
+    {160,160,   6*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 100+ 1, 1,3 },
+    {160,160,   4*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 2, 1,1 },
+    {160,160,   9*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 100+ 3, 1,3 },
+    {160,160,   5*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 4, 1,1 },
+    {160,160,   6*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 5, 1,1 },
+    {160,160,  12*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 100+ 6, 1,3 },
+    {160,160,   7*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 7, 1,1 },
+    {160,160,  15*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 100+ 8, 1,3 },
+    {160,160,   8*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 9, 1,1 },
 
-    {160,160,  200+  1*FLEET_DISTANCE,100+4*FLEET_DISTANCE, 150+ 1, 1,0 },
-    {160,160,  200+  2*FLEET_DISTANCE,100+4*FLEET_DISTANCE, 150+ 2, 1,0 },
-    {160,160,  200+  3*FLEET_DISTANCE,100+4*FLEET_DISTANCE, 150+ 3, 1,0 },
-    {160,160,  200+  4*FLEET_DISTANCE,100+4*FLEET_DISTANCE, 150+ 4, 1,0 },
-    {160,160,  200+  5*FLEET_DISTANCE,100+4*FLEET_DISTANCE, 150+ 5, 1,0 },
-    {600,160,  200+  6*FLEET_DISTANCE,100+4*FLEET_DISTANCE, 150+ 1, 2,0 },
-    {600,160,  200+  7*FLEET_DISTANCE,100+4*FLEET_DISTANCE, 150+ 2, 2,0 },
-    {600,160,  200+  8*FLEET_DISTANCE,100+4*FLEET_DISTANCE, 150+ 3, 2,0 },
-    {600,160,  200+  9*FLEET_DISTANCE,100+4*FLEET_DISTANCE, 150+ 4, 2,0 },
-    {600,160,  200+ 10*FLEET_DISTANCE,100+4*FLEET_DISTANCE, 150+ 5, 2,0 },
+    {160,160,   1*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 1, 1,0 },
+    {160,160,   2*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 2, 1,0 },
+    {160,160,   3*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 3, 1,0 },
+    {160,160,   4*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 4, 1,0 },
+    {160,160,   5*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 5, 1,0 },
+    {600,160,   6*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 1, 2,0 },
+    {600,160,   7*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 2, 2,0 },
+    {600,160,   8*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 3, 2,0 },
+    {600,160,   9*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 4, 2,0 },
+    {600,160,  10*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 5, 2,0 },
 
     {  0,0,     0,0,   0, 0,-1} // end (alien type -1)
 };
@@ -307,8 +324,8 @@ void ship_homing(struct starship *s)
 {
   int dir;
   int xd, yd;
-  xd = s->hx - s->x;
-  yd = s->hy - s->y;
+  xd = Fleet.x + s->hx - s->x;
+  yd = Fleet.y + s->hy - s->y;
   if(xd > SPEED * FPSCALE)
   {
     xd = SPEED * FPSCALE;
@@ -322,27 +339,28 @@ void ship_homing(struct starship *s)
       dir = 2; // left
     }
   }
-  if(yd > SPEED * FPSCALE)
+
+  if(yd < -(SPEED * FPSCALE))
   {
-    yd = SPEED * FPSCALE;
+    yd = -(SPEED * FPSCALE);
     dir = 1; // up
   }
   else
   {
-    if(yd < -(SPEED * FPSCALE))
+    if(yd > SPEED * FPSCALE)
     {
-      yd = -(SPEED * FPSCALE);
+      yd = SPEED * FPSCALE;
       dir = 3; // down
     }
   }
   s->x += xd;
   s->y += yd;
-  if(abs(xd) < FPSCALE/2 && abs(yd) < FPSCALE/2)
+  if(abs(xd) < 2*SPEED*FPSCALE/FLEET_DRIFT && abs(yd) < 2*SPEED*FPSCALE/FLEET_DRIFT)
   // if( xd == 0 && yd == 0 )
   {
     s->state = S_ALIEN_HOME;
-    s->x = s->hx;
-    s->y = s->hy;
+    s->x = Fleet.x + s->hx;
+    s->y = Fleet.y + s->hy;
     dir = 3; // down
   }
   s->a = dir * 64; // orient alien down
@@ -355,10 +373,8 @@ void ship_homing(struct starship *s)
 // fly the ship in the fleet
 void ship_fleet(struct starship *s)
 {
- #if 0
-   c2.Sprite[s->sprite]->x = s->hx / FPSCALE;
-   c2.Sprite[s->sprite]->y = s->hy / FPSCALE;
- #endif
+  c2.Sprite[s->sprite]->x = (Fleet.x + s->hx) / FPSCALE;
+  c2.Sprite[s->sprite]->y = (Fleet.y + s->hy) / FPSCALE;
 }
 
 void ship_frame(struct starship *s)
@@ -380,6 +396,17 @@ void ship_frame(struct starship *s)
       ship_fleet(s);
       break;
   }
+}
+
+void fleet_move()
+{
+  if(Fleet.x <= Fleet.xmin)
+    Fleet.xd = (FPSCALE*SPEED/FLEET_DRIFT);
+
+  if( Fleet.x >= Fleet.xmax)
+    Fleet.xd = -(FPSCALE*SPEED/FLEET_DRIFT);
+
+  Fleet.x += Fleet.xd;
 }
 
 void setup()
@@ -424,6 +451,7 @@ void loop()
 {
   int i;
 
+  fleet_move();
   for(i = 0; i < SHIPS_MAX; i++)
     ship_frame( &(Starship[i]) );
 
