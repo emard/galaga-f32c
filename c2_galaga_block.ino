@@ -282,12 +282,15 @@ void ship_convoy(struct starship *s)
     }
     else
     {
+#if 0
       // alien directly to home
       // FIXME: this is to early, "HOMING" state is skipped
       s->a = 192; // orient alien down
       // c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
       c2.sprite_link_content(s->shape + 3, s->sprite); // orient alien down
       s->state = S_ALIEN_HOME;
+#endif
+      s->state = S_ALIEN_HOMING;
     }
   }
 }
@@ -298,6 +301,25 @@ void ship_prepare(struct starship *s)
     s->prepare--;
   else
     s->state = S_ALIEN_CONVOY;
+}
+
+void ship_homing(struct starship *s)
+{
+  if(s->x > s->hx)
+    s->x -= SPEED * FPSCALE;
+  if(s->x < s->hx)
+    s->x += SPEED * FPSCALE;
+  if(s->y > s->hy)
+    s->y -= SPEED * FPSCALE;
+  if(s->y < s->hy)
+    s->y += SPEED * FPSCALE;
+  if(s->x == s->hx && s->y == s->hy)
+    s->state = S_ALIEN_HOME;
+  s->a = 192; // orient alien down
+  // c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+  c2.sprite_link_content(s->shape + 3, s->sprite); // orient alien down
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
 
 // fly the ship in the fleet
@@ -318,6 +340,9 @@ void ship_frame(struct starship *s)
       break;
     case S_ALIEN_CONVOY:
       ship_convoy(s);
+      break;
+    case S_ALIEN_HOMING:
+      ship_homing(s);
       break;
     case S_ALIEN_HOME:
       ship_fleet(s);
