@@ -14,7 +14,7 @@
 #define FPSCALE 256
 
 // global speed 1/2/4/8 (more=faster)
-#define SPEED 1
+#define SPEED 4
 
 // fleet drift (more = SLOWER)
 #define FLEET_DRIFT 4
@@ -32,7 +32,8 @@ enum
 { 
   S_NONE,
   S_ALIEN_PREPARE, S_ALIEN_CONVOY, S_ALIEN_HOMING, S_ALIEN_HOME,
-  S_ALIEN_ATTACK, S_ALIEN_EXPLODING, S_ALIEN_DEAD
+  S_ALIEN_ATTACK, S_ALIEN_EXPLODING, S_ALIEN_DEAD,
+  S_BOMB,
 };
 
 struct fleet
@@ -47,6 +48,17 @@ struct fleet Fleet =
   200*FPSCALE,100*FPSCALE, // initial xy
   100*FPSCALE,300*FPSCALE, // min-max x
   SPEED*FPSCALE/FLEET_DRIFT // initial x-dir
+};
+
+// here ship will publish its x/y coordinates
+struct ship
+{
+  int x,y;
+};
+
+struct ship Ship =
+{
+  320*FPSCALE,400*FPSCALE // ship coordinates
 };
 
 struct path_segment
@@ -229,11 +241,22 @@ void create_sine_table()
 {
   int i;
   isin = (int) malloc(256 * sizeof(int));
-  for(i = 0; i < 255; i++)
+  for(i = 0; i < 256; i++)
     isin[i] = (sin(i * 2.0 * M_PI / 256.0) * (1.0*FPSCALE) + 0.5);
 }
 
-void create_ships()
+struct starship *find_free()
+{
+  int i;
+  for(i = 0; i < SHIPS_MAX; i++)
+  {
+    if( Starship[i].state == S_NONE )
+      return &(Starship[i]);
+  }
+  return NULL;
+}
+
+void create_aliens()
 {
   int i;
   int path_type;
@@ -242,14 +265,16 @@ void create_ships()
   Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
 
   for(i = 0; i < SHIPS_MAX; i++)
+  {
     Starship[i].state = S_NONE;
+    Starship[i].sprite = 40+i;
+  }
 
   convoy = Convoy1;
   for(i = 0; i < 50; i++)
   {
     if( convoy[i].alien_type == -1)
-      return;
-      // continue; // abort for-loop
+      return; // abort for-loop
     Starship[i].x = convoy[i].x * FPSCALE; // where it will enter screen
     Starship[i].y = convoy[i].y * FPSCALE;
     Starship[i].hx = convoy[i].hx * FPSCALE; // fleet home position
@@ -373,11 +398,64 @@ void ship_homing(struct starship *s)
 // fly the ship in the fleet
 void ship_fleet(struct starship *s)
 {
+  uint16_t rng;
+
+  s->x = Fleet.x + s->hx;
+  s->y = Fleet.y + s->hy;
+
   c2.Sprite[s->sprite]->x = (Fleet.x + s->hx) / FPSCALE;
   c2.Sprite[s->sprite]->y = (Fleet.y + s->hy) / FPSCALE;
+
+  rng = rand();
+
+  if(rng < 50)
+    bomb_create(s->x, s->y, 192);
 }
 
-void ship_frame(struct starship *s)
+
+void fleet_move()
+{
+  if(Fleet.x <= Fleet.xmin)
+    Fleet.xd = (FPSCALE*SPEED/FLEET_DRIFT);
+
+  if( Fleet.x >= Fleet.xmax)
+    Fleet.xd = -(FPSCALE*SPEED/FLEET_DRIFT);
+
+  Fleet.x += Fleet.xd;
+
+}
+
+// bomb starting from x,y, fly at angle a
+void bomb_create(int x, int y, uint8_t a)
+{
+  struct starship *s;
+  s = find_free();
+  if(s == NULL)
+    return;
+  s->x = x;
+  s->y = y;
+  s->a = a;
+  s->state = S_BOMB;
+  c2.sprite_link_content(33, s->sprite);
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+}
+
+void bomb_move(struct starship *s)
+{
+  int v = SPEED*FPSCALE;
+  if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE)
+  {
+    s->state = S_NONE;
+    return;
+  }
+  s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
+  s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+}
+
+void everything_move(struct starship *s)
 {
   switch(s->state)
   {
@@ -395,18 +473,10 @@ void ship_frame(struct starship *s)
     case S_ALIEN_HOME:
       ship_fleet(s);
       break;
+    case S_BOMB:
+      bomb_move(s);
+      break;
   }
-}
-
-void fleet_move()
-{
-  if(Fleet.x <= Fleet.xmin)
-    Fleet.xd = (FPSCALE*SPEED/FLEET_DRIFT);
-
-  if( Fleet.x >= Fleet.xmax)
-    Fleet.xd = -(FPSCALE*SPEED/FLEET_DRIFT);
-
-  Fleet.x += Fleet.xd;
 }
 
 void setup()
@@ -415,8 +485,8 @@ void setup()
   c2.init();
   c2.alloc_sprites(SPRITE_MAX);
   create_sine_table();
-  create_ships();
-
+  create_aliens();
+ 
   #if 1
     for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
       c2.shape_to_sprite(&Shape[i]);
@@ -428,6 +498,14 @@ void setup()
       c2.Sprite[i]->y = 0 + 12*i;
     }
   #endif
+
+  // place the ship, just to display something
+  c2.sprite_link_content(29, 39); // copy image 29 (ship) to 39 (sprite)
+  c2.Sprite[39]->x = Ship.x / FPSCALE;
+  c2.Sprite[39]->y = Ship.y / FPSCALE;
+
+  // experimental bomb
+  // bomb_create(300*FPSCALE,50*FPSCALE,191);
 
   if(1)
   {
@@ -453,7 +531,7 @@ void loop()
 
   fleet_move();
   for(i = 0; i < SHIPS_MAX; i++)
-    ship_frame( &(Starship[i]) );
+    everything_move( &(Starship[i]) );
 
   while((*c2.vblank_reg & 0x80) == 0);
   c2.sprite_refresh();
