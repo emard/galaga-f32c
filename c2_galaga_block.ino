@@ -140,6 +140,7 @@ struct path_types Path_types[] =
 };
 
 int *isin; // sine table for angles 0-255
+int *iatan; // arctan table 0-FPSCALE
 
 struct starship
 {
@@ -243,6 +244,14 @@ void create_sine_table()
   isin = (int) malloc(256 * sizeof(int));
   for(i = 0; i < 256; i++)
     isin[i] = (sin(i * 2.0 * M_PI / 256.0) * (1.0*FPSCALE) + 0.5);
+}
+
+void create_atan_table()
+{
+  int i;
+  iatan = (int) malloc(FPSCALE * sizeof(int));
+  for(i = 0; i < FPSCALE; i++)
+    iatan[i] = atan(i * (1.0 / FPSCALE)) * 256.0 / (2 * M_PI) + 0.5;
 }
 
 struct starship *find_free()
@@ -395,6 +404,12 @@ void ship_homing(struct starship *s)
   c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
 
+// calculate bomb angle from alien starship to the player's ship 
+int calc_bomb_angle(struct starship *s)
+{
+  return 192+iatan[FPSCALE/2];
+}
+
 // fly the ship in the fleet
 void ship_fleet(struct starship *s)
 {
@@ -409,7 +424,7 @@ void ship_fleet(struct starship *s)
   rng = rand();
 
   if(rng < 50)
-    bomb_create(s->x, s->y, 192);
+    bomb_create(s->x, s->y, calc_bomb_angle(s));
 }
 
 
@@ -485,6 +500,7 @@ void setup()
   c2.init();
   c2.alloc_sprites(SPRITE_MAX);
   create_sine_table();
+  create_atan_table();
   create_aliens();
  
   #if 1
