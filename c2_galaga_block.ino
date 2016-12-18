@@ -148,6 +148,40 @@ struct path_segment stage1_wave1_right[] =
   {0,0,0} // end
 };
 
+struct path_segment alien_attack1[] =
+{
+  {SPEED*FPSCALE,  208, 0,      64/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  208,-SPEED,  32/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  176, SPEED,  32/SPEED }, // right circle 32 frames
+  {SPEED*FPSCALE,  208,-SPEED,  32/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  176, SPEED,  32/SPEED }, // right circle 32 frames
+  {SPEED*FPSCALE,  208,-SPEED,  32/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  176, SPEED,  32/SPEED }, // right circle 32 frames
+  {SPEED*FPSCALE,  208,-SPEED,  32/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  176, SPEED,  32/SPEED }, // right circle 32 frames
+  {SPEED*FPSCALE,  208,-SPEED,  32/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  176, SPEED,  32/SPEED }, // right circle 32 frames
+  {SPEED*FPSCALE,  208,-SPEED,  32/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  176, SPEED,  32/SPEED }, // right circle 32 frames
+  {0,0,0} // end
+};
+
+struct path_segment alien_attack2[] =
+{
+  {SPEED*FPSCALE,  224, 0,      64/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 32 frames
+  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 32 frames
+  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 32 frames
+  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 32 frames
+  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 32 frames
+  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 32 frames
+  {0,0,0} // end
+};
+
 struct path_types
 {
   struct path_segment *path;
@@ -160,6 +194,8 @@ struct path_types Path_types[] =
   [2] = {stage2_convoy_right},
   [3] = {stage1_wave1_left},
   [4] = {stage1_wave1_right},
+  [5] = {alien_attack1},
+  [6] = {alien_attack2},
   {NULL}
 };
 
@@ -333,7 +369,7 @@ void create_aliens()
     Starship[i].prepare = convoy[i].prepare * CONVOY_DISTANCE / SPEED;
     Starship[i].sprite = 40+i;
     Starship[i].shape = (convoy[i].alien_type & 3)*4; // shape base, added rotation 0-3
-    Starship[i].path_type = convoy[i].path; // type 0 path
+    Starship[i].path_type = convoy[i].path; // path to follow
     path = Path_types[Starship[i].path_type].path;
     Starship[i].a = path[0].a;
     Starship[i].path_state = 0;
@@ -342,16 +378,20 @@ void create_aliens()
 }
 
 // calculate next frame x y for the starship
-void alien_convoy(struct starship *s)
+// reshape=0 -> do not change shape on direction change
+void alien_convoy(struct starship *s, int reshape)
 {
   int v;
   struct path_segment *path;
   path = Path_types[s->path_type].path;
   v = path[s->path_state].v;
-  if( s->path_count )
+  if( s->path_count > 0 )
   {
     s->path_count--;
-    c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+    if(reshape != 0)
+    {
+      c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+    }
     s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
     s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
     s->a += path[s->path_state].r; // rotate
@@ -364,8 +404,11 @@ void alien_convoy(struct starship *s)
     {
       s->path_state++;
       s->path_count = path[s->path_state].n;
-      s->a  = path[s->path_state].a;
-      c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+      s->a = path[s->path_state].a;
+      if(reshape != 0)
+      {
+        c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+      }
       s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
       s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
       s->a += path[s->path_state].r; // rotate
@@ -374,14 +417,6 @@ void alien_convoy(struct starship *s)
     }
     else
     {
-#if 0
-      // alien directly to home
-      // FIXME: this is to early, "HOMING" state is skipped
-      s->a = 192; // orient alien down
-      // c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-      c2.sprite_link_content(s->shape + 3, s->sprite); // orient alien down
-      s->state = S_ALIEN_HOME;
-#endif
       s->state = S_ALIEN_HOMING;
     }
   }
@@ -509,7 +544,13 @@ void alien_fleet(struct starship *s)
 
   if(rng > 50 && rng < 100)
   {
+    struct path_segment *path;
+    s->path_type = 5; // 5 is attack path
+    path = Path_types[s->path_type].path;
     s->state = S_ALIEN_ATTACK;
+    s->path_state = 0; // 0 resets path to the first segment of the path
+    s->path_count = path[0].n; // contdown of the path segment
+    s->path_type = 6; // select attack path
   }
 }
 
@@ -529,25 +570,9 @@ void fleet_move()
 // attack flight path steering of the alien ship
 void alien_attack(struct starship *s)
 {
-  uint16_t rng;
+  uint16_t rng = rand();
+  int v = FPSCALE;
   uint8_t a;
-  int v = SPEED*FPSCALE;
-  if(s->y < 480*FPSCALE)
-  {
-    s->a = 192; // fly directly down,
-  }
-  else
-  {
-    s->y = 0;
-    s->state = S_ALIEN_HOMING;
-  }
-  c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-  s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
-  s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
-  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
-
-  rng = rand();
 
   if(rng < 2000)
   {
@@ -555,6 +580,24 @@ void alien_attack(struct starship *s)
     if(a != 0)
       bomb_create(s->x, s->y, a);
   }
+
+  if(s->y < 480*FPSCALE)
+  {
+    alien_convoy(s,1); // should be (s,0) but there's some bug in angle?
+    return;
+  }
+  else
+  {
+    s->y = 0;
+    s->state = S_ALIEN_HOMING;
+  }
+  a = 192;
+  s->a = a;
+  c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+  s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
+  s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
 
 // bomb starting from x,y, fly at angle a
@@ -598,7 +641,7 @@ void everything_move(struct starship *s)
       alien_prepare(s);
       break;
     case S_ALIEN_CONVOY:
-      alien_convoy(s);
+      alien_convoy(s,1);
       break;
     case S_ALIEN_HOMING:
       alien_homing(s);
