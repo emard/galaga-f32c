@@ -407,7 +407,7 @@ void alien_homing(struct starship *s)
 // calculate bomb angle from alien starship to the player's ship 
 // possible angles are within 45 degrees
 // if ship is outside of reach - return 0
-uint8_t calc_bomb_angle(struct starship *s)
+uint8_t aim_bomb_angle(struct starship *s)
 {
   int rev = 1;
   int dx, dy;
@@ -461,7 +461,7 @@ void alien_fleet(struct starship *s)
 
   if(rng < 50)
   {
-    a = calc_bomb_angle(s);
+    a = aim_bomb_angle(s);
     if(a != 0)
       bomb_create(s->x, s->y, a);
   }
