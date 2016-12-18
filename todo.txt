@@ -1,12 +1,13 @@
 [ ] adjust center for all shapes
 [ ] multiple level fleet setup struct
 [ ] attacking stage
-[ ] attractive explosions, fireballs
+[ ] attractive explosions, fireballs, firework-ball
 [ ] collision detection
 [ ] ship missiles
-[ ] alien bombs
-    calculated angle to hit the ship
+[x] alien bombs
+[x] aim bomb, stationary ship: calculated angle to hit the ship
+[ ] aim bomb, moving ship: shoot bomb to location when ship will move
 [ ] peaceful aliens: they don't shoot until first
     of them is killed
 [ ] alien abduction for double gun
-[ ] alloc new shape (using the free ones)
+[x] alloc new shape (using the free ones)
