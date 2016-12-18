@@ -395,8 +395,7 @@ void create_aliens()
 // angular move the ship with velocity v
 void object_angular_move(struct starship *s, int v)
 {
-  uint8_t xa;
-  xa = 64 + s->a;
+  uint8_t xa = 64 + s->a;
   s->x += isin[xa] * v / FPSCALE; // cos
   s->y -= isin[s->a] * v / FPSCALE; // sin
   c2.Sprite[s->sprite]->x = s->x / FPSCALE;
