@@ -301,7 +301,7 @@ void create_aliens()
 }
 
 // calculate next frame x y for the starship
-void ship_convoy(struct starship *s)
+void alien_convoy(struct starship *s)
 {
   int v;
   struct path_segment *path;
@@ -346,7 +346,7 @@ void ship_convoy(struct starship *s)
   }
 }
 
-void ship_prepare(struct starship *s)
+void alien_prepare(struct starship *s)
 {
   if(s->prepare > 0)
     s->prepare--;
@@ -354,7 +354,7 @@ void ship_prepare(struct starship *s)
     s->state = S_ALIEN_CONVOY;
 }
 
-void ship_homing(struct starship *s)
+void alien_homing(struct starship *s)
 {
   int dir;
   int xd, yd;
@@ -405,8 +405,8 @@ void ship_homing(struct starship *s)
 }
 
 // calculate bomb angle from alien starship to the player's ship 
-// possible angles are within 45 degreen
-// outside of reach - return 0
+// possible angles are within 45 degrees
+// if ship is outside of reach - return 0
 uint8_t calc_bomb_angle(struct starship *s)
 {
   int rev = 1;
@@ -446,7 +446,7 @@ uint8_t calc_bomb_angle(struct starship *s)
 }
 
 // fly the ship in the fleet
-void ship_fleet(struct starship *s)
+void alien_fleet(struct starship *s)
 {
   uint16_t rng;
   uint8_t a;
@@ -517,16 +517,16 @@ void everything_move(struct starship *s)
     case S_NONE:
       return;
     case S_ALIEN_PREPARE:
-      ship_prepare(s);
+      alien_prepare(s);
       break;
     case S_ALIEN_CONVOY:
-      ship_convoy(s);
+      alien_convoy(s);
       break;
     case S_ALIEN_HOMING:
-      ship_homing(s);
+      alien_homing(s);
       break;
     case S_ALIEN_HOME:
-      ship_fleet(s);
+      alien_fleet(s);
       break;
     case S_BOMB:
       bomb_move(s);
