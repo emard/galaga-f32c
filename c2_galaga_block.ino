@@ -323,15 +323,19 @@ void create_sine_table()
   int i;
   isin = (int) malloc(256 * sizeof(int));
   for(i = 0; i < 256; i++)
-    isin[i] = (sin(i * 2.0 * M_PI / 256.0) * (1.0*FPSCALE) + 0.5);
-  // known bug in sine table calculation
+    isin[i] = sin(i * 2.0 * M_PI / 256.0) * (1.0*FPSCALE) + 0.5;
+  // sine calculation is suspected to have some
   // probably C math library problem
-  // some values are sometimes calculated wrong
-  // bug manifests as sometimes angular values are wrong
+  // like some values are sometimes calculated wrong.
+  // printing sine table seems it is OK
+  // probably we have bugs in another place.
+  // bug manifests as sometimes angular values for X are wrong
   // so convoy gets a bit messed up and attack
-  // paths drift too much to the left 
+  // paths sometimes drift too much to the left 
+  #if 0
   for(i = 0; i < 256; i++)
     printf("isin[%d] = %d\n", i, isin[i]);
+  #endif
 }
 
 void create_atan_table()
@@ -388,6 +392,45 @@ void create_aliens()
   }
 }
 
+// angular move the ship with velocity v
+void object_angular_move(struct starship *s, int v)
+{
+  uint8_t xa;
+  xa = 64 + s->a;
+  s->x += isin[xa] * v / FPSCALE; // cos
+  s->y -= isin[s->a] * v / FPSCALE; // sin
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+}
+
+// bomb starting from x,y, fly at angle a
+void bomb_create(int x, int y, uint8_t a)
+{
+  struct starship *s;
+  s = find_free();
+  if(s == NULL)
+    return;
+  s->x = x;
+  s->y = y;
+  s->a = a;
+  s->state = S_BOMB;
+  c2.sprite_link_content(33, s->sprite);
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+}
+
+void bomb_move(struct starship *s)
+{
+  int v = SPEED*FPSCALE*5/4;
+  if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE)
+  {
+    s->state = S_NONE;
+    c2.Sprite[s->sprite]->y = 640; // off-screen, invisible
+    return;
+  }
+  object_angular_move(s,v);
+}
+
 // calculate next frame x y for the starship
 // reshape=0 -> do not change shape on direction change
 void alien_convoy(struct starship *s, int reshape)
@@ -401,15 +444,9 @@ void alien_convoy(struct starship *s, int reshape)
   {
     s->path_count--;
     if(reshape != 0)
-    {
       c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-    }
-    xa = 64 + s->a;
-    s->x += isin[xa] * v / FPSCALE; // cos
-    s->y -= isin[s->a] * v / FPSCALE; // sin
+    object_angular_move(s,v);
     s->a += path[s->path_state].r; // rotate
-    c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-    c2.Sprite[s->sprite]->y = s->y / FPSCALE;
   }
   else
   {
@@ -419,15 +456,9 @@ void alien_convoy(struct starship *s, int reshape)
       s->path_count = path[s->path_state].n;
       s->a = path[s->path_state].a;
       if(reshape != 0)
-      {
         c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-      }
-      xa = 64 + s->a;
-      s->x += isin[xa] * v / FPSCALE; // cos
-      s->y -= isin[s->a] * v / FPSCALE; // sin
+      object_angular_move(s,v);
       s->a += path[s->path_state].r; // rotate
-      c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-      c2.Sprite[s->sprite]->y = s->y / FPSCALE;
     }
     else
     {
@@ -614,36 +645,6 @@ void alien_attack(struct starship *s)
   c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
 
-// bomb starting from x,y, fly at angle a
-void bomb_create(int x, int y, uint8_t a)
-{
-  struct starship *s;
-  s = find_free();
-  if(s == NULL)
-    return;
-  s->x = x;
-  s->y = y;
-  s->a = a;
-  s->state = S_BOMB;
-  c2.sprite_link_content(33, s->sprite);
-  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
-}
-
-void bomb_move(struct starship *s)
-{
-  int v = SPEED*FPSCALE*5/4;
-  if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE)
-  {
-    s->state = S_NONE;
-    c2.Sprite[s->sprite]->y = 640; // off-screen, invisible
-    return;
-  }
-  s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
-  s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
-  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
-}
 
 void everything_move(struct starship *s)
 {
