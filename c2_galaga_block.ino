@@ -36,6 +36,9 @@ enum
   S_BOMB,
 };
 
+int *isin; // sine table for angles 0-255
+uint8_t *iatan; // arctan table 0-FPSCALE
+
 struct fleet
 {
   int x,y;
@@ -108,6 +111,42 @@ struct path_segment stage2_convoy_right[] =
   {0,0,0} // end
 };
 
+struct path_segment stage1_wave1_left[] =
+{
+  {SPEED*FPSCALE,  176, 0,     256/SPEED }, // down left 256 frames
+  {SPEED*FPSCALE,  176, SPEED,  80/SPEED }, // right circle 80 frames
+  {SPEED*FPSCALE,    0, 0,     128/SPEED }, // right 128 frames
+  {SPEED*FPSCALE,    0, SPEED,  64/SPEED }, // right circle 64 frames
+  {SPEED*FPSCALE,   64, 0,     128/SPEED }, // up 128 frames
+  {0,0,0} // end
+};
+
+struct path_segment stage1_wave1_right[] =
+{
+  {SPEED*FPSCALE,  208, 0,     256/SPEED }, // down right 256 frames
+  {SPEED*FPSCALE,  208,-SPEED,  80/SPEED }, // left circle 80 frames
+  {SPEED*FPSCALE,  128, 0,     128/SPEED }, // left 128 frames
+  {SPEED*FPSCALE,  128,-SPEED,  64/SPEED }, // left circle 64 frames
+  {SPEED*FPSCALE,   64, 0,     128/SPEED }, // up 128 frames
+  {0,0,0} // end
+};
+
+struct path_types
+{
+  struct path_segment *path;
+};
+
+struct path_types Path_types[] =
+{
+  [0] = {stage1_convoy},
+  [1] = {stage2_convoy_left},
+  [2] = {stage2_convoy_right},
+  [3] = {stage1_wave1_left},
+  [4] = {stage1_wave1_right},
+  {NULL}
+};
+
+
 /* fleet formation example
 **
 ** 3.  4       W  W W  W
@@ -126,21 +165,6 @@ struct path_segment stage2_convoy_right[] =
 **           ->        <-
 */
 
-struct path_types
-{
-  struct path_segment *path;
-};
-
-struct path_types Path_types[] =
-{
-  [0] = {stage1_convoy},
-  [1] = {stage2_convoy_left},
-  [2] = {stage2_convoy_right},
-  {NULL}
-};
-
-int *isin; // sine table for angles 0-255
-uint8_t *iatan; // arctan table 0-FPSCALE
 
 struct starship
 {
@@ -170,16 +194,16 @@ struct convoy
 
 struct convoy Convoy1[] =
 {
-    {160,160,   1*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 1,0 },
-    {160,160,   2*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 1,0 },
-    {160,160,   3*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 1,0 },
-    {160,160,   4*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 1,0 },
-    {160,160,   5*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 1,0 },
-    {600,160,   6*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 2,0 },
-    {600,160,   7*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 2,0 },
-    {600,160,   8*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 2,0 },
-    {600,160,   9*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 2,0 },
-    {600,160,  10*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 2,0 },
+    {160,  0,   1*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 3,0 },
+    {160,  0,   2*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 3,0 },
+    {160,  0,   3*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 3,0 },
+    {160,  0,   4*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 3,0 },
+    {160,  0,   5*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 3,0 },
+    {200,  0,   6*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 4,0 },
+    {200,  0,   7*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 4,0 },
+    {200,  0,   8*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 4,0 },
+    {200,  0,   9*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 4,0 },
+    {200,  0,  10*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 4,0 },
 
     {600,160,   2*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 0, 2,1 },
     {600,160,   3*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 1, 2,1 },
