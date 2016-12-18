@@ -48,8 +48,8 @@ struct fleet
 
 struct fleet Fleet =
 {
-  200*FPSCALE,100*FPSCALE, // initial xy
-  100*FPSCALE,300*FPSCALE, // min-max x
+  200*FPSCALE,50*FPSCALE, // initial xy
+  160*FPSCALE,400*FPSCALE, // min-max x
   SPEED*FPSCALE/FLEET_DRIFT // initial x-dir
 };
 
@@ -61,7 +61,7 @@ struct ship
 
 struct ship Ship =
 {
-  320*FPSCALE,400*FPSCALE // ship coordinates
+  400*FPSCALE,400*FPSCALE // ship coordinates
 };
 
 struct path_segment
@@ -70,6 +70,23 @@ struct path_segment
   uint8_t a; // initial angle 0-255 covers 0-360 degrees, 0->right, 64->up, 128->left, 192->down
   int8_t r; // rotation (angle increment)
   int n; // how many frames to run on this path segment, 0 for last
+};
+
+struct path_segment stage1_demo[] =
+{
+  {FPSCALE,   0, 0, 50 }, // right 50 frames
+  {FPSCALE,  32, 0, 50 }, // right-up 50 frames
+  {FPSCALE,  64, 0, 50 }, // up 50 fames
+  {FPSCALE,  96, 0, 50 }, // up-left 50 fames
+  {FPSCALE, 128, 0, 50 }, // left 50 fames
+  {FPSCALE, 160, 0, 50 }, // left-down 50 fames
+  {FPSCALE, 192, 0, 50 }, // down 50 fames
+  {FPSCALE, 224, 0, 50 }, // down-right 50 fames
+  {FPSCALE,   0, 1, 256 }, // left circle 256 frames
+  {FPSCALE,   0,-1, 256 }, // right circle 256 frames
+  {FPSCALE,   0, 1, 256 }, // left circle 256 frames
+  {FPSCALE,   0,-1, 256 }, // right circle 256 frames
+  {0,0,0} // end
 };
 
 struct path_segment stage1_convoy[] =
@@ -95,8 +112,8 @@ struct path_segment stage2_convoy_left[] =
   {SPEED*FPSCALE,   0, SPEED, 256/SPEED }, // left circle 256 frames
   {SPEED*FPSCALE,   8, 0,     128/SPEED }, // right slightly up 128 frames
   {SPEED*FPSCALE,   0,-SPEED, 256/SPEED }, // right circle 256 frames
-  {SPEED*FPSCALE,   0, SPEED, 256/SPEED }, // left circle 256 frames
-  {SPEED*FPSCALE,   0,-SPEED, 256/SPEED }, // right circle 256 frames
+  {SPEED*FPSCALE,   0, SPEED, 126/SPEED }, // left helf-circle 128 frames
+  {SPEED*FPSCALE, 128,-SPEED, 128/SPEED }, // right helf-circle 128 frames
   {0,0,0} // end
 };
 
@@ -106,8 +123,8 @@ struct path_segment stage2_convoy_right[] =
   {SPEED*FPSCALE,  128,-SPEED, 256/SPEED }, // left circle 256 frames
   {SPEED*FPSCALE,  120, 0,     128/SPEED }, // right slightly up 128 frames
   {SPEED*FPSCALE,  128, SPEED, 256/SPEED }, // right circle 256 frames
-  {SPEED*FPSCALE,  128,-SPEED, 256/SPEED }, // left circle 256 frames
-  {SPEED*FPSCALE,  128, SPEED, 256/SPEED }, // right circle 256 frames
+  {SPEED*FPSCALE,  128,-SPEED, 128/SPEED }, // left half-circle 128 frames
+  {SPEED*FPSCALE,    0, SPEED, 128/SPEED }, // right half-circle 128 frames
   {0,0,0} // end
 };
 
@@ -194,47 +211,47 @@ struct convoy
 
 struct convoy Convoy1[] =
 {
-    {260,  0,   1*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 3,0 },
-    {260,  0,   2*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 3,0 },
-    {260,  0,   3*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 3,0 },
-    {260,  0,   4*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 3,0 },
-    {260,  0,   5*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 3,0 },
-    {300,  0,   6*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 4,0 },
-    {300,  0,   7*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 4,0 },
-    {300,  0,   8*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 4,0 },
-    {300,  0,   9*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 4,0 },
-    {300,  0,  10*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 4,0 },
+    {380,  0,   1*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 3,0 },
+    {380,  0,   2*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 3,0 },
+    {380,  0,   3*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 3,0 },
+    {380,  0,   4*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 3,0 },
+    {380,  0,   5*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 3,0 },
+    {420,  0,   6*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 4,0 },
+    {420,  0,   7*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 4,0 },
+    {420,  0,   8*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 4,0 },
+    {420,  0,   9*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 4,0 },
+    {420,  0,  10*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 4,0 },
 
-    {600,160,   2*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 0, 2,1 },
-    {600,160,   3*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 1, 2,1 },
-    {600,160,   4*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 2, 2,1 },
-    {600,160,   5*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 3, 2,1 },
-    {600,160,   6*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 4, 2,1 },
-    {600,160,   7*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 5, 2,1 },
-    {600,160,   8*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 6, 2,1 },
-    {600,160,   9*FLEET_DISTANCE,2*FLEET_DISTANCE, 50+ 7, 2,1 },
+    {640,320,   2*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 0, 2,1 },
+    {640,320,   3*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 1, 2,1 },
+    {640,320,   4*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 2, 2,1 },
+    {640,320,   5*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 3, 2,1 },
+    {640,320,   6*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 4, 2,1 },
+    {640,320,   7*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 5, 2,1 },
+    {640,320,   8*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 6, 2,1 },
+    {640,320,   9*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 7, 2,1 },
 
-    {160,160,   3*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 0, 1,1 },
-    {160,160,   6*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 100+ 1, 1,3 },
-    {160,160,   4*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 2, 1,1 },
-    {160,160,   9*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 100+ 3, 1,3 },
-    {160,160,   5*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 4, 1,1 },
-    {160,160,   6*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 5, 1,1 },
-    {160,160,  12*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 100+ 6, 1,3 },
-    {160,160,   7*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 7, 1,1 },
-    {160,160,  15*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 100+ 8, 1,3 },
-    {160,160,   8*FLEET_DISTANCE,1*FLEET_DISTANCE, 100+ 9, 1,1 },
+    {160,320,   3*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 0, 1,1 },
+    {160,320,   6*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 90+ 1, 1,3 },
+    {160,320,   4*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 2, 1,1 },
+    {160,320,   9*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 90+ 3, 1,3 },
+    {160,320,   5*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 4, 1,1 },
+    {160,320,   6*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 5, 1,1 },
+    {160,320,  12*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 90+ 6, 1,3 },
+    {160,320,   7*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 7, 1,1 },
+    {160,320,  15*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 90+ 8, 1,3 },
+    {160,320,   8*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 9, 1,1 },
 
-    {160,160,   1*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 1, 1,0 },
-    {160,160,   2*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 2, 1,0 },
-    {160,160,   3*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 3, 1,0 },
-    {160,160,   4*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 4, 1,0 },
-    {160,160,   5*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 5, 1,0 },
-    {600,160,   6*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 1, 2,0 },
-    {600,160,   7*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 2, 2,0 },
-    {600,160,   8*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 3, 2,0 },
-    {600,160,   9*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 4, 2,0 },
-    {600,160,  10*FLEET_DISTANCE,4*FLEET_DISTANCE, 150+ 5, 2,0 },
+    {380,  0,   1*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 1, 3,0 },
+    {380,  0,   2*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 2, 3,0 },
+    {380,  0,   3*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 3, 3,0 },
+    {380,  0,   4*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 4, 3,0 },
+    {380,  0,   5*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 5, 3,0 },
+    {420,  0,   6*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 1, 4,0 },
+    {420,  0,   7*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 2, 4,0 },
+    {420,  0,   8*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 3, 4,0 },
+    {420,  0,   9*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 4, 4,0 },
+    {420,  0,  10*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 5, 4,0 },
 
     {  0,0,     0,0,   0, 0,-1} // end (alien type -1)
 };
