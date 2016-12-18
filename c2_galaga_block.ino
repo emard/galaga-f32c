@@ -406,7 +406,7 @@ void alien_homing(struct starship *s)
 
 // calculate bomb angle from alien starship to the player's ship 
 // possible angles are within 45 degrees
-// if ship is outside of reach - return 0
+// if ship is out of shooting range - return 0
 uint8_t aim_bomb_angle(struct starship *s)
 {
   int rev = 1;
