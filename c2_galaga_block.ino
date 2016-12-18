@@ -25,6 +25,9 @@
 // alien x-distance in fleet
 #define FLEET_DISTANCE 20
 
+// showcase all sprites on the left (debug)
+#define SHOWCASE_SPRITES 0
+
 Compositing c2;
 
 // starship states
@@ -321,6 +324,14 @@ void create_sine_table()
   isin = (int) malloc(256 * sizeof(int));
   for(i = 0; i < 256; i++)
     isin[i] = (sin(i * 2.0 * M_PI / 256.0) * (1.0*FPSCALE) + 0.5);
+  // known bug in sine table calculation
+  // probably C math library problem
+  // some values are sometimes calculated wrong
+  // bug manifests as sometimes angular values are wrong
+  // so convoy gets a bit messed up and attack
+  // paths drift too much to the left 
+  for(i = 0; i < 256; i++)
+    printf("isin[%d] = %d\n", i, isin[i]);
 }
 
 void create_atan_table()
@@ -382,6 +393,7 @@ void create_aliens()
 void alien_convoy(struct starship *s, int reshape)
 {
   int v;
+  uint8_t xa;
   struct path_segment *path;
   path = Path_types[s->path_type].path;
   v = path[s->path_state].v;
@@ -392,8 +404,9 @@ void alien_convoy(struct starship *s, int reshape)
     {
       c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
     }
-    s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
-    s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
+    xa = 64 + s->a;
+    s->x += isin[xa] * v / FPSCALE; // cos
+    s->y -= isin[s->a] * v / FPSCALE; // sin
     s->a += path[s->path_state].r; // rotate
     c2.Sprite[s->sprite]->x = s->x / FPSCALE;
     c2.Sprite[s->sprite]->y = s->y / FPSCALE;
@@ -409,8 +422,9 @@ void alien_convoy(struct starship *s, int reshape)
       {
         c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
       }
-      s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
-      s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
+      xa = 64 + s->a;
+      s->x += isin[xa] * v / FPSCALE; // cos
+      s->y -= isin[s->a] * v / FPSCALE; // sin
       s->a += path[s->path_state].r; // rotate
       c2.Sprite[s->sprite]->x = s->x / FPSCALE;
       c2.Sprite[s->sprite]->y = s->y / FPSCALE;
@@ -583,7 +597,7 @@ void alien_attack(struct starship *s)
 
   if(s->y < 480*FPSCALE)
   {
-    alien_convoy(s,1); // should be (s,0) but there's some bug in angle?
+    alien_convoy(s,0); // should be (s,0) but there's some bug in angle?
     return;
   }
   else
@@ -675,7 +689,11 @@ void setup()
     for(i = 0; i < c2.n_sprites; i++)
     {
       c2.Sprite[i]->x = 0 + 32*(i&3);
+      #if SHOWCASE_SPRITES
       c2.Sprite[i]->y = 0 + 12*i;
+      #else
+      c2.Sprite[i]->y = 640; // off screen (invisible)
+      #endif
     }
   #endif
 
