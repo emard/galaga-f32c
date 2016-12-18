@@ -529,22 +529,32 @@ void fleet_move()
 // attack flight path steering of the alien ship
 void alien_attack(struct starship *s)
 {
-  int v = FPSCALE;
+  uint16_t rng;
+  uint8_t a;
+  int v = SPEED*FPSCALE;
   if(s->y < 480*FPSCALE)
   {
-    s->y += SPEED*FPSCALE; // fly directly down, trivial path, debug purpose
+    s->a = 192; // fly directly down,
   }
   else
   {
     s->y = 0;
     s->state = S_ALIEN_HOMING;
   }
-  s->a  = 192;
   c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
   s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
   s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
   c2.Sprite[s->sprite]->x = s->x / FPSCALE;
   c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+
+  rng = rand();
+
+  if(rng < 2000)
+  {
+    a = aim_bomb_angle(s);
+    if(a != 0)
+      bomb_create(s->x, s->y, a);
+  }
 }
 
 // bomb starting from x,y, fly at angle a
@@ -565,7 +575,7 @@ void bomb_create(int x, int y, uint8_t a)
 
 void bomb_move(struct starship *s)
 {
-  int v = SPEED*FPSCALE;
+  int v = SPEED*FPSCALE*5/4;
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE)
   {
     s->state = S_NONE;
