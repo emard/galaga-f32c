@@ -579,6 +579,7 @@ void bomb_move(struct starship *s)
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE)
   {
     s->state = S_NONE;
+    c2.Sprite[s->sprite]->y = 640; // off-screen, invisible
     return;
   }
   s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
