@@ -1,17 +1,19 @@
-# GALAGA c2
+# GALAGA for f32c and its c2 sprites
 
 Galaga rework for FPGArduino f32c
 with look and feel of Henrik Wening's legendary
 GALAGA with 1/4 cursor block graphics for PET and C64.
 
+This galaga game is currently incomplete, just a tool for
+demo and earch for bugs (if any) in f32c CPU core, c2 sprites,
+their libraries and new gcc.
+
 Henrik did it by looking at original Galaga.
 I did it by looking at Henrik's work.
 
-See C64 video example at
-
-    https://www.youtube.com/watch?v=4c_li-PBJ6g
-    Game #058 Galaga
-    http://www.theawardian.de/?p=5153
+See C64 video example
+[GALAGA on youtube](https://www.youtube.com/watch?v=4c_li-PBJ6g)
+[Game #058 Galaga](http://www.theawardian.de/?p=5153)
 
 # Modifications
 
