@@ -5,8 +5,8 @@ with look and feel of Henrik Wening's legendary
 GALAGA with 1/4 cursor block graphics for PET and C64.
 
 This galaga game is currently incomplete, just a tool for
-demo and earch for bugs (if any) in f32c CPU core, c2 sprites,
-their libraries and new gcc.
+sprite graphics demo and search for bugs (if any) in f32c CPU core, 
+c2 sprites, their libraries and new gcc.
 
 Henrik did it by looking at original Galaga.
 I did it by looking at Henrik's work.
