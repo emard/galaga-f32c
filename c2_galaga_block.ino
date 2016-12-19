@@ -151,7 +151,13 @@ struct path_segment stage1_wave1_right[] =
   {0,0,0} // end
 };
 
-struct path_segment alien_attack1[] =
+struct path_segment alien_attack_straight_down[] =
+{
+  {SPEED*FPSCALE,  192, 0,     512/SPEED }, // straight down 512frames
+  {0,0,0} // end
+};
+
+struct path_segment alien_attack_small_vibration[] =
 {
   {SPEED*FPSCALE,  208, 0,      64/SPEED }, // down right 64 frames
   {SPEED*FPSCALE,  208,-SPEED,  32/SPEED }, // left circle 32 frames
@@ -169,36 +175,96 @@ struct path_segment alien_attack1[] =
   {0,0,0} // end
 };
 
-struct path_segment alien_attack2[] =
+struct path_segment alien_attack_medium_vibration[] =
 {
   {SPEED*FPSCALE,  224, 0,      64/SPEED }, // down right 64 frames
-  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 32 frames
-  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 32 frames
-  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 32 frames
-  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 32 frames
-  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 32 frames
-  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 32 frames
-  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 32 frames
-  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 32 frames
-  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 32 frames
-  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 32 frames
+  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 64 frames
+  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 64 frames
+  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 64 frames
+  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 64 frames
+  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 64 frames
+  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 64 frames
+  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 64 frames
+  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 64 frames
+  {SPEED*FPSCALE,  224,-SPEED,  64/SPEED }, // left circle 64 frames
+  {SPEED*FPSCALE,  160, SPEED,  64/SPEED }, // right circle 64 frames
+  {0,0,0} // end
+};
+
+struct path_segment alien_attack_zig_zag_return[] =
+{
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {0,0,0} // end
+};
+
+struct path_segment alien_attack_zig_zag_thru[] =
+{
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {0,0,0} // end
+};
+
+struct path_segment alien_attack_zig_zag_small_circle[] =
+{
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, SPEED, 256/SPEED }, // left circle 64 frames
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, 0,     128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,     128/SPEED }, // down left 64 frames
+  {0,0,0} // end
+};
+
+struct path_segment alien_attack_zig_zag_big_circle[] =
+{
+  {SPEED*FPSCALE,  223, 0,      128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,      128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, 0,      128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,      128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, SPEED/2,512/SPEED }, // left circle 64 frames
+  {SPEED*FPSCALE,  223, 0,      128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,      128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, 0,      128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,      128/SPEED }, // down left 64 frames
+  {SPEED*FPSCALE,  223, 0,      128/SPEED }, // down right 64 frames
+  {SPEED*FPSCALE,  161, 0,      128/SPEED }, // down left 64 frames
   {0,0,0} // end
 };
 
 struct path_types
 {
   struct path_segment *path;
+  int orientation; // should the sprite be reshaped (for angular orientation)
 };
 
 struct path_types Path_types[] =
 {
-  [0] = {stage1_convoy},
-  [1] = {stage2_convoy_left},
-  [2] = {stage2_convoy_right},
-  [3] = {stage1_wave1_left},
-  [4] = {stage1_wave1_right},
-  [5] = {alien_attack1},
-  [6] = {alien_attack2},
+  [0] = {stage1_convoy,1},
+  [1] = {stage2_convoy_left,1},
+  [2] = {stage2_convoy_right,1},
+  [3] = {stage1_wave1_left,1},
+  [4] = {stage1_wave1_right,1},
+  [5] = {alien_attack_straight_down,0}, // go down straight
+  [6] = {alien_attack_small_vibration,0}, // go down with small vibration
+  [7] = {alien_attack_medium_vibration,0}, // go down with larger vibration
+  [8] = {alien_attack_zig_zag_return,1}, // small zig-zag and return
+  [9] = {alien_attack_zig_zag_thru,0}, // go down zig-zag way all way thru
+ [10] = {alien_attack_zig_zag_small_circle,1}, // go down zig-zag way all way thru
+ [11] = {alien_attack_zig_zag_big_circle,1}, // go down zig-zag way all way thru
   {NULL}
 };
 
@@ -432,12 +498,13 @@ void bomb_move(struct starship *s)
 
 // calculate next frame x y for the starship
 // reshape=0 -> do not change shape on direction change
-void alien_convoy(struct starship *s, int reshape)
+void alien_convoy(struct starship *s)
 {
   int v;
   uint8_t xa;
   struct path_segment *path;
   path = Path_types[s->path_type].path;
+  int reshape = Path_types[s->path_type].orientation;
   v = path[s->path_state].v;
   if( s->path_count > 0 )
   {
@@ -589,12 +656,13 @@ void alien_fleet(struct starship *s)
   if(rng > 50 && rng < 100)
   {
     struct path_segment *path;
-    s->path_type = 5; // 5 is attack path
+    s->path_type = 5+(rng % 7); // 5 is attack path
+    // s->path_type = 11; // force type for testing
     path = Path_types[s->path_type].path;
     s->state = S_ALIEN_ATTACK;
     s->path_state = 0; // 0 resets path to the first segment of the path
     s->path_count = path[0].n; // contdown of the path segment
-    s->path_type = 6; // select attack path
+    s->a = path[0].a; // initial angle
   }
 }
 
@@ -627,7 +695,7 @@ void alien_attack(struct starship *s)
 
   if(s->y < 480*FPSCALE)
   {
-    alien_convoy(s,0); // should be (s,0) but there's some bug in angle?
+    alien_convoy(s); // should be (s,0) but there's some bug in angle?
     return;
   }
   else
@@ -655,7 +723,7 @@ void everything_move(struct starship *s)
       alien_prepare(s);
       break;
     case S_ALIEN_CONVOY:
-      alien_convoy(s,1);
+      alien_convoy(s);
       break;
     case S_ALIEN_HOMING:
       alien_homing(s);
