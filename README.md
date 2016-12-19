@@ -13,6 +13,7 @@ I did it by looking at Henrik's work.
 
 See C64 video example
 [GALAGA on youtube](https://www.youtube.com/watch?v=4c_li-PBJ6g)
+or here
 [Game #058 Galaga](http://www.theawardian.de/?p=5153)
 
 # Modifications
@@ -25,6 +26,10 @@ agressive beings, which is not politically correct...
 Here aliens come in peace.
 They won't fire a single missile
 until first of them is killed...
+
+But as the game is incomplete, the above is not currently
+only a TODO. Aliens are shooting harmless bullets, the player
+ship can't shoot or move...
 
 # Technical details
 
