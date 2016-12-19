@@ -135,7 +135,7 @@ struct path_segment stage1_wave1_left[] =
 {
   {SPEED*FPSCALE,  176, 0,     256/SPEED }, // down left 256 frames
   {SPEED*FPSCALE,  176, SPEED,  80/SPEED }, // right circle 80 frames
-  {SPEED*FPSCALE,    0, 0,     128/SPEED }, // right 128 frames
+  {SPEED*FPSCALE,    8, 0,     128/SPEED }, // right up 128 frames
   {SPEED*FPSCALE,    0, SPEED,  64/SPEED }, // right circle 64 frames
   {SPEED*FPSCALE,   64, 0,     128/SPEED }, // up 128 frames
   {0,0,0} // end
@@ -145,7 +145,7 @@ struct path_segment stage1_wave1_right[] =
 {
   {SPEED*FPSCALE,  208, 0,     256/SPEED }, // down right 256 frames
   {SPEED*FPSCALE,  208,-SPEED,  80/SPEED }, // left circle 80 frames
-  {SPEED*FPSCALE,  128, 0,     128/SPEED }, // left 128 frames
+  {SPEED*FPSCALE,  120, 0,     128/SPEED }, // left up 128 frames
   {SPEED*FPSCALE,  128,-SPEED,  64/SPEED }, // left circle 64 frames
   {SPEED*FPSCALE,   64, 0,     128/SPEED }, // up 128 frames
   {0,0,0} // end
