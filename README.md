@@ -27,7 +27,7 @@ Here aliens come in peace.
 They won't fire a single missile
 until first of them is killed...
 
-But as the game is incomplete, the above is not currently
+But as the game is incomplete, the above is currently
 only a TODO. Aliens are shooting harmless bullets, the player
 ship can't shoot or move...
 
