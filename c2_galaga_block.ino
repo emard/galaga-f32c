@@ -696,20 +696,15 @@ void alien_attack(struct starship *s)
   if(s->y < 480*FPSCALE)
   {
     alien_convoy(s); // should be (s,0) but there's some bug in angle?
-    return;
   }
   else
   {
-    s->y = 0;
+    s->y = 0; // jump to top of the screen
+    s->a = 192; // angle down
+    object_angular_move(s, v); // initial move
+    c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
     s->state = S_ALIEN_HOMING;
   }
-  a = 192;
-  s->a = a;
-  c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-  s->x += isin[(64 + s->a) & 255] * v / FPSCALE; // cos
-  s->y -= isin[      s->a  & 255] * v / FPSCALE; // sin
-  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
 
 
