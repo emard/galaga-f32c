@@ -676,7 +676,6 @@ void fleet_move()
     Fleet.xd = -(FPSCALE*SPEED/FLEET_DRIFT);
 
   Fleet.x += Fleet.xd;
-
 }
 
 // attack flight path steering of the alien ship
