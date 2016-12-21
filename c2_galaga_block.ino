@@ -25,6 +25,9 @@
 // alien x-distance in fleet
 #define FLEET_DISTANCE 20
 
+// numver of different attack formations in the fleet
+#define FLEET_MAX_GROUP 10
+
 // showcase all sprites on the left (debug)
 #define SHOWCASE_SPRITES 0
 
@@ -277,6 +280,14 @@ struct path_types Path_types[] =
 ** 1. 10  v v v v v v v v v v
 ** 4. 10  v v v v v v v v v v
 **
+** the attack groups
+**
+** 3.  4       1  2 3  4
+** 3.  6      1 1 2 3 4 4
+** 2.  8    5 5 6 6 7 7 8 8
+** 1. 10  5 5 5 6 6 7 7 8 8 8
+** 4. 10  5 5 5 6 6 7 7 8 8 8
+**
 ** 1. v v v v v        v v v v v
 **           /          \
 **           ->        <-
@@ -309,6 +320,7 @@ struct convoy
 {
   int x,y;      // x,y entry point on the screen
   int hx,hy;    // x,y coordinates in fleet
+  int group;    // group membership
   int prepare;  // time delay of the alien to prepare for convoy start
   int8_t path;  // convoy path type
   int8_t alien_type; // alien type 0-3, -1 end
@@ -316,49 +328,49 @@ struct convoy
 
 struct convoy Convoy1[] =
 {
-    {380,  0,   1*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 3,0 },
-    {380,  0,   2*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 3,0 },
-    {380,  0,   3*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 3,0 },
-    {380,  0,   4*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 3,0 },
-    {380,  0,   5*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 3,0 },
-    {420,  0,   6*FLEET_DISTANCE,3*FLEET_DISTANCE,  1, 4,0 },
-    {420,  0,   7*FLEET_DISTANCE,3*FLEET_DISTANCE,  2, 4,0 },
-    {420,  0,   8*FLEET_DISTANCE,3*FLEET_DISTANCE,  3, 4,0 },
-    {420,  0,   9*FLEET_DISTANCE,3*FLEET_DISTANCE,  4, 4,0 },
-    {420,  0,  10*FLEET_DISTANCE,3*FLEET_DISTANCE,  5, 4,0 },
+    {380,  0,   1*FLEET_DISTANCE,3*FLEET_DISTANCE,5,  1, 3,0 },
+    {380,  0,   2*FLEET_DISTANCE,3*FLEET_DISTANCE,5,  2, 3,0 },
+    {380,  0,   3*FLEET_DISTANCE,3*FLEET_DISTANCE,5,  3, 3,0 },
+    {380,  0,   4*FLEET_DISTANCE,3*FLEET_DISTANCE,6,  4, 3,0 },
+    {380,  0,   5*FLEET_DISTANCE,3*FLEET_DISTANCE,6,  5, 3,0 },
+    {420,  0,   6*FLEET_DISTANCE,3*FLEET_DISTANCE,7,  1, 4,0 },
+    {420,  0,   7*FLEET_DISTANCE,3*FLEET_DISTANCE,7,  2, 4,0 },
+    {420,  0,   8*FLEET_DISTANCE,3*FLEET_DISTANCE,8,  3, 4,0 },
+    {420,  0,   9*FLEET_DISTANCE,3*FLEET_DISTANCE,8,  4, 4,0 },
+    {420,  0,  10*FLEET_DISTANCE,3*FLEET_DISTANCE,8,  5, 4,0 },
 
-    {640,280,   2*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 0, 2,1 },
-    {640,280,   3*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 1, 2,1 },
-    {640,280,   4*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 2, 2,1 },
-    {640,280,   5*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 3, 2,1 },
-    {640,280,   6*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 4, 2,1 },
-    {640,280,   7*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 5, 2,1 },
-    {640,280,   8*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 6, 2,1 },
-    {640,280,   9*FLEET_DISTANCE,2*FLEET_DISTANCE, 40+ 7, 2,1 },
+    {640,280,   2*FLEET_DISTANCE,2*FLEET_DISTANCE,5, 40+ 0, 2,1 },
+    {640,280,   3*FLEET_DISTANCE,2*FLEET_DISTANCE,5, 40+ 1, 2,1 },
+    {640,280,   4*FLEET_DISTANCE,2*FLEET_DISTANCE,6, 40+ 2, 2,1 },
+    {640,280,   5*FLEET_DISTANCE,2*FLEET_DISTANCE,6, 40+ 3, 2,1 },
+    {640,280,   6*FLEET_DISTANCE,2*FLEET_DISTANCE,7, 40+ 4, 2,1 },
+    {640,280,   7*FLEET_DISTANCE,2*FLEET_DISTANCE,7, 40+ 5, 2,1 },
+    {640,280,   8*FLEET_DISTANCE,2*FLEET_DISTANCE,8, 40+ 6, 2,1 },
+    {640,280,   9*FLEET_DISTANCE,2*FLEET_DISTANCE,8, 40+ 7, 2,1 },
 
-    {160,280,   3*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 0, 1,1 },
-    {160,280,   6*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 90+ 1, 1,3 },
-    {160,280,   4*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 2, 1,1 },
-    {160,280,   9*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 90+ 3, 1,3 },
-    {160,280,   5*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 4, 1,1 },
-    {160,280,   6*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 5, 1,1 },
-    {160,280,  12*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 90+ 6, 1,3 },
-    {160,280,   7*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 7, 1,1 },
-    {160,280,  15*FLEET_DISTANCE/2,0*FLEET_DISTANCE, 90+ 8, 1,3 },
-    {160,280,   8*FLEET_DISTANCE,  1*FLEET_DISTANCE, 90+ 9, 1,1 },
+    {160,280,   3*FLEET_DISTANCE,  1*FLEET_DISTANCE,1,  90+ 0, 1,1 },
+    {160,280,   6*FLEET_DISTANCE/2,0*FLEET_DISTANCE,1,  90+ 1, 1,3 },
+    {160,280,   4*FLEET_DISTANCE,  1*FLEET_DISTANCE,1,  90+ 2, 1,1 },
+    {160,280,   9*FLEET_DISTANCE/2,0*FLEET_DISTANCE,2,  90+ 3, 1,3 },
+    {160,280,   5*FLEET_DISTANCE,  1*FLEET_DISTANCE,2,  90+ 4, 1,1 },
+    {160,280,   6*FLEET_DISTANCE,  1*FLEET_DISTANCE,3,  90+ 5, 1,1 },
+    {160,280,  12*FLEET_DISTANCE/2,0*FLEET_DISTANCE,3,  90+ 6, 1,3 },
+    {160,280,   7*FLEET_DISTANCE,  1*FLEET_DISTANCE,4,  90+ 7, 1,1 },
+    {160,280,  15*FLEET_DISTANCE/2,0*FLEET_DISTANCE,4,  90+ 8, 1,3 },
+    {160,280,   8*FLEET_DISTANCE,  1*FLEET_DISTANCE,4,  90+ 9, 1,1 },
 
-    {380,  0,   1*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 1, 3,0 },
-    {380,  0,   2*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 2, 3,0 },
-    {380,  0,   3*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 3, 3,0 },
-    {380,  0,   4*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 4, 3,0 },
-    {380,  0,   5*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 5, 3,0 },
-    {420,  0,   6*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 1, 4,0 },
-    {420,  0,   7*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 2, 4,0 },
-    {420,  0,   8*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 3, 4,0 },
-    {420,  0,   9*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 4, 4,0 },
-    {420,  0,  10*FLEET_DISTANCE,4*FLEET_DISTANCE, 140+ 5, 4,0 },
+    {380,  0,   1*FLEET_DISTANCE,4*FLEET_DISTANCE,5, 140+ 1, 3,0 },
+    {380,  0,   2*FLEET_DISTANCE,4*FLEET_DISTANCE,5, 140+ 2, 3,0 },
+    {380,  0,   3*FLEET_DISTANCE,4*FLEET_DISTANCE,5, 140+ 3, 3,0 },
+    {380,  0,   4*FLEET_DISTANCE,4*FLEET_DISTANCE,6, 140+ 4, 3,0 },
+    {380,  0,   5*FLEET_DISTANCE,4*FLEET_DISTANCE,6, 140+ 5, 3,0 },
+    {420,  0,   6*FLEET_DISTANCE,4*FLEET_DISTANCE,7, 140+ 1, 4,0 },
+    {420,  0,   7*FLEET_DISTANCE,4*FLEET_DISTANCE,7, 140+ 2, 4,0 },
+    {420,  0,   8*FLEET_DISTANCE,4*FLEET_DISTANCE,8, 140+ 3, 4,0 },
+    {420,  0,   9*FLEET_DISTANCE,4*FLEET_DISTANCE,8, 140+ 4, 4,0 },
+    {420,  0,  10*FLEET_DISTANCE,4*FLEET_DISTANCE,8, 140+ 5, 4,0 },
 
-    {  0,0,     0,0,   0, 0,-1} // end (alien type -1)
+    {  0,0,     0,0,0,   0, 0,-1} // end (alien type -1)
 };
 
 struct convoy Convoy_demo[] =
@@ -441,7 +453,7 @@ void create_aliens()
   for(i = 0; i < 50; i++)
   {
     if( convoy[i].alien_type == -1)
-      return; // abort for-loop
+      return; // abort for-loop --- todo this must be done better
     Starship[i].x = convoy[i].x * FPSCALE; // where it will enter screen
     Starship[i].y = convoy[i].y * FPSCALE;
     Starship[i].hx = convoy[i].hx * FPSCALE; // fleet home position
@@ -653,6 +665,7 @@ void alien_fleet(struct starship *s)
       bomb_create(s->x, s->y, a);
   }
 
+  if(0)
   if(rng > 50 && rng < 100)
   {
     struct path_segment *path;
@@ -664,6 +677,46 @@ void alien_fleet(struct starship *s)
     s->path_count = path[0].n; // contdown of the path segment
     s->a = path[0].a; // initial angle
   }
+}
+
+// select a group of alien ships in the fleet
+// that will perform an attack, all flying
+// the same path
+void fleet_select_attack()
+{
+  uint32_t rng = rand();
+  int group;
+  int i;
+  if(rng < 60000000)
+  {
+    struct convoy *convoy = Convoy1;
+    group = 1 + (rng % 10); // select which group will attack
+    // group = 1;
+    // todo: if no ships are in this group in the fleet,
+    // choose next group
+    // search for all ships, find those which are members of
+    // selected group and are in FLEET HOME state
+    for(i = 0; i < SHIPS_MAX; i++)
+    {
+      if(convoy[i].alien_type == -1)
+        return; // no more ships --- todo this must be done better
+
+      if(Starship[i].state == S_ALIEN_HOME && convoy[i].group == group)
+      {
+        // found the candidate for the group attack
+        struct starship *s = &(Starship[i]);
+        struct path_segment *path;
+        s->path_type = 5+(rng % 7); // 5 is attack path
+        // s->path_type = 11; // force type for testing
+        path = Path_types[s->path_type].path;
+        s->state = S_ALIEN_ATTACK;
+        s->path_state = 0; // 0 resets path to the first segment of the path
+        s->path_count = path[0].n; // contdown of the path segment
+        s->a = path[0].a; // initial angle
+      }
+    }
+  }
+
 }
 
 
@@ -790,6 +843,7 @@ void loop()
   int i;
 
   fleet_move();
+  fleet_select_attack();
   for(i = 0; i < SHIPS_MAX; i++)
     everything_move( &(Starship[i]) );
 
