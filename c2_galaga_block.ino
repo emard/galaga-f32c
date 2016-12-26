@@ -37,8 +37,9 @@ Compositing c2;
 enum 
 { 
   S_NONE,
-  S_ALIEN_PREPARE, S_ALIEN_CONVOY, S_ALIEN_HOMING, S_ALIEN_HOME,
-  S_ALIEN_ATTACK, S_ALIEN_EXPLODING, S_ALIEN_DEAD,
+  S_ALIEN_PREPARE,
+  S_ALIEN_CONVOY, S_ALIEN_HOMING, S_ALIEN_HOME, S_ALIEN_ATTACK,
+  S_ALIEN_EXPLODING, S_ALIEN_DEAD,
   S_BOMB, S_MISSILE, S_SHIP,
 };
 
@@ -527,9 +528,41 @@ void missile_create(int x, int y)
   c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
 
+// alien collision
+// returns non-null pointer 
+// to the alien which is hit by the missile s
+struct starship *alien_hit(struct starship *s)
+{
+  int i;
+  struct starship *as;
+  struct convoy *convoy = Convoy1;
+  int xr = 4*FPSCALE, yr = 8*FPSCALE; // collision range
+  for(i = 0; i < SHIPS_MAX; i++)
+  {
+    if( convoy[i].alien_type == -1)
+      return NULL; // abort for-loop --- todo this must be done better
+    as = &(Starship[i]);
+    // is this ship alien alive?
+    if(as->state >= S_ALIEN_CONVOY && as->state <= S_ALIEN_ATTACK)
+    {
+      if(as->x - xr < s->x && as->x + xr > s->x
+      && as->y - yr < s->y && as->y + yr > s->y)
+        return as;
+    }
+  }
+  return NULL; // no alien is hit
+}
+
 void missile_move(struct starship *s)
 {
-  if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE)
+  struct starship *ah = alien_hit(s);
+  if(ah != NULL)
+  {
+    ah->state = S_NONE;
+    // todo: create alien explosion
+    c2.Sprite[ah->sprite]->y = 640; // alien off-screen, invisible
+  }
+  if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE || ah != NULL)
   {
     s->state = S_NONE;
     c2.Sprite[s->sprite]->y = 640; // off-screen, invisible
