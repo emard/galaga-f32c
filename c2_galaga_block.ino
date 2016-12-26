@@ -39,7 +39,7 @@ enum
   S_NONE,
   S_ALIEN_PREPARE, S_ALIEN_CONVOY, S_ALIEN_HOMING, S_ALIEN_HOME,
   S_ALIEN_ATTACK, S_ALIEN_EXPLODING, S_ALIEN_DEAD,
-  S_BOMB, S_MISSILE,
+  S_BOMB, S_MISSILE, S_SHIP,
 };
 
 int *isin; // sine table for angles 0-255
@@ -511,7 +511,7 @@ void bomb_move(struct starship *s)
 }
 
 // missile starting from x,y
-void misile_create(int x, int y)
+void missile_create(int x, int y)
 {
   struct starship *s;
   s = find_free();
@@ -520,7 +520,7 @@ void misile_create(int x, int y)
   s->x = x;
   s->y = y;
   s->a = 64; // fly up
-  s->v = 2*SPEED*FPSCALE;
+  s->v = 3*SPEED*FPSCALE;
   s->state = S_MISSILE;
   c2.sprite_link_content(24, s->sprite);
   c2.Sprite[s->sprite]->x = s->x / FPSCALE;
@@ -790,6 +790,33 @@ void alien_attack(struct starship *s)
   }
 }
 
+// ship at x,y
+void ship_create(int x, int y)
+{
+  struct starship *s;
+  s = find_free();
+  if(s == NULL)
+    return;
+  s->x = x;
+  s->y = y;
+  s->a = 64; // fly up
+  s->v = 0;
+  s->state = S_SHIP;
+  c2.sprite_link_content(29, s->sprite);
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+}
+
+
+void ship_move(struct starship *s)
+{
+  uint16_t rng = rand();
+  if(rng < 2000)
+  {
+    missile_create(Ship.x+4*FPSCALE, Ship.y);
+  }
+}
+
 
 void everything_move(struct starship *s)
 {
@@ -815,6 +842,12 @@ void everything_move(struct starship *s)
     case S_BOMB:
       bomb_move(s);
       break;
+    case S_MISSILE:
+      missile_move(s);
+      break;
+    case S_SHIP:
+      ship_move(s);
+      break;
   }
 }
 
@@ -826,7 +859,7 @@ void setup()
   create_sine_table();
   create_atan_table();
   create_aliens();
- 
+
   #if 1
     for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
       c2.shape_to_sprite(&Shape[i]);
@@ -843,10 +876,8 @@ void setup()
     }
   #endif
 
-  // place the ship, just to display something
-  c2.sprite_link_content(29, 39); // copy image 29 (ship) to 39 (sprite)
-  c2.Sprite[39]->x = Ship.x / FPSCALE;
-  c2.Sprite[39]->y = Ship.y / FPSCALE;
+  // create the ship, just to display something
+  ship_create(Ship.x, Ship.y);
 
   // experimental bomb
   // bomb_create(300*FPSCALE,50*FPSCALE,191);
