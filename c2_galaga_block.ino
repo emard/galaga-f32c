@@ -39,7 +39,7 @@ enum
   S_NONE,
   S_ALIEN_PREPARE, S_ALIEN_CONVOY, S_ALIEN_HOMING, S_ALIEN_HOME,
   S_ALIEN_ATTACK, S_ALIEN_EXPLODING, S_ALIEN_DEAD,
-  S_BOMB,
+  S_BOMB, S_MISSILE,
 };
 
 int *isin; // sine table for angles 0-255
@@ -492,6 +492,7 @@ void bomb_create(int x, int y, uint8_t a)
   s->x = x;
   s->y = y;
   s->a = a;
+  s->v = SPEED*FPSCALE*5/4;
   s->state = S_BOMB;
   c2.sprite_link_content(33, s->sprite);
   c2.Sprite[s->sprite]->x = s->x / FPSCALE;
@@ -500,7 +501,6 @@ void bomb_create(int x, int y, uint8_t a)
 
 void bomb_move(struct starship *s)
 {
-  s->v = SPEED*FPSCALE*5/4;
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE)
   {
     s->state = S_NONE;
@@ -509,6 +509,35 @@ void bomb_move(struct starship *s)
   }
   object_angular_move(s);
 }
+
+// missile starting from x,y
+void misile_create(int x, int y)
+{
+  struct starship *s;
+  s = find_free();
+  if(s == NULL)
+    return;
+  s->x = x;
+  s->y = y;
+  s->a = 64; // fly up
+  s->v = 2*SPEED*FPSCALE;
+  s->state = S_MISSILE;
+  c2.sprite_link_content(24, s->sprite);
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+}
+
+void missile_move(struct starship *s)
+{
+  if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE)
+  {
+    s->state = S_NONE;
+    c2.Sprite[s->sprite]->y = 640; // off-screen, invisible
+    return;
+  }
+  object_angular_move(s);
+}
+
 
 // calculate next frame x y for the starship
 // reshape=0 -> do not change shape on direction change
