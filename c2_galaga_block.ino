@@ -303,6 +303,7 @@ struct starship
 {
   int x,y; // current coordinates of this starship (x256)
   uint8_t a; // current angle of movement
+  int v; // the speed (usually SPEED*FPSCALE). 1*FPSCALE -> 1 pixel per frame
   int state; // the state number
   int prepare; // prepare countdown
   int sprite; // sprite number which is used to display this starship
@@ -465,17 +466,18 @@ void create_aliens()
     Starship[i].path_type = convoy[i].path; // path to follow
     path = Path_types[Starship[i].path_type].path;
     Starship[i].a = path[0].a;
+    Starship[i].v = path[0].v;
     Starship[i].path_state = 0;
     Starship[i].path_count = path[0].n;
   }
 }
 
 // angular move the ship with velocity v
-void object_angular_move(struct starship *s, int v)
+void object_angular_move(struct starship *s)
 {
   uint8_t xa = 64 + s->a;
-  s->x += isin[xa] * v / FPSCALE; // cos
-  s->y -= isin[s->a] * v / FPSCALE; // sin
+  s->x += isin[xa] * s->v / FPSCALE; // cos
+  s->y -= isin[s->a] * s->v / FPSCALE; // sin
   c2.Sprite[s->sprite]->x = s->x / FPSCALE;
   c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
@@ -498,14 +500,14 @@ void bomb_create(int x, int y, uint8_t a)
 
 void bomb_move(struct starship *s)
 {
-  int v = SPEED*FPSCALE*5/4;
+  s->v = SPEED*FPSCALE*5/4;
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE)
   {
     s->state = S_NONE;
     c2.Sprite[s->sprite]->y = 640; // off-screen, invisible
     return;
   }
-  object_angular_move(s,v);
+  object_angular_move(s);
 }
 
 // calculate next frame x y for the starship
@@ -517,13 +519,13 @@ void alien_convoy(struct starship *s)
   struct path_segment *path;
   path = Path_types[s->path_type].path;
   int reshape = Path_types[s->path_type].orientation;
-  v = path[s->path_state].v;
+  s->v = path[s->path_state].v;
   if( s->path_count > 0 )
   {
     s->path_count--;
     if(reshape != 0)
       c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-    object_angular_move(s,v);
+    object_angular_move(s);
     s->a += path[s->path_state].r; // rotate
   }
   else
@@ -535,7 +537,7 @@ void alien_convoy(struct starship *s)
       s->a = path[s->path_state].a;
       if(reshape != 0)
         c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-      object_angular_move(s,v);
+      object_angular_move(s);
       s->a += path[s->path_state].r; // rotate
     }
     else
@@ -735,7 +737,6 @@ void fleet_move()
 void alien_attack(struct starship *s)
 {
   uint16_t rng = rand();
-  int v = FPSCALE;
   uint8_t a;
 
   if(rng < 2000)
@@ -745,6 +746,7 @@ void alien_attack(struct starship *s)
       bomb_create(s->x, s->y, a);
   }
 
+  s->v = SPEED*FPSCALE;
   if(s->y < 480*FPSCALE)
   {
     alien_convoy(s); // should be (s,0) but there's some bug in angle?
@@ -753,7 +755,7 @@ void alien_attack(struct starship *s)
   {
     s->y = 0; // jump to top of the screen
     s->a = 192; // angle down
-    object_angular_move(s, v); // initial move
+    object_angular_move(s); // initial move
     c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
     s->state = S_ALIEN_HOMING;
   }
