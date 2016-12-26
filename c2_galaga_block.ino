@@ -811,10 +811,19 @@ void ship_create(int x, int y)
 void ship_move(struct starship *s)
 {
   uint16_t rng = rand();
+  static int xdir = SPEED*FPSCALE/2; // x-direction that ship moves
   if(rng < 2000)
   {
     missile_create(Ship.x+4*FPSCALE, Ship.y);
   }
+  if(s->x > 600*FPSCALE && xdir > 0)
+    xdir = -SPEED*FPSCALE/2;
+  if(s->x < 100*FPSCALE && xdir < 0)
+    xdir =  SPEED*FPSCALE/2;
+  s->x += xdir;
+  Ship.x = s->x; // publish ship's new x coordinate (y stays the same)
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
 
 
