@@ -45,6 +45,7 @@ enum
 
 int *isin; // sine table for angles 0-255
 uint8_t *iatan; // arctan table 0-FPSCALE
+int Alien_count = 0; // number of aliens on the screen
 
 struct fleet
 {
@@ -426,6 +427,17 @@ void create_atan_table()
     iatan[i] = atan(i * (1.0 / FPSCALE)) * 256.0 / (2 * M_PI) + 0.5;
 }
 
+void allocate_ships()
+{
+  int i;
+  Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
+  for(i = 0; i < SHIPS_MAX; i++)
+  {
+    Starship[i].state = S_NONE;
+    Starship[i].sprite = 40+i;
+  }
+}
+
 struct starship *find_free()
 {
   int i;
@@ -443,33 +455,30 @@ void create_aliens()
   int path_type;
   struct convoy *convoy;
   struct path_segment *path;
-  Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
-
-  for(i = 0; i < SHIPS_MAX; i++)
-  {
-    Starship[i].state = S_NONE;
-    Starship[i].sprite = 40+i;
-  }
+  struct starship *s;
 
   convoy = Convoy1;
-  for(i = 0; i < 50; i++)
+  for(i = 0; i < SHIPS_MAX; i++)
   {
     if( convoy[i].alien_type == -1)
       return; // abort for-loop --- todo this must be done better
-    Starship[i].x = convoy[i].x * FPSCALE; // where it will enter screen
-    Starship[i].y = convoy[i].y * FPSCALE;
-    Starship[i].hx = convoy[i].hx * FPSCALE; // fleet home position
-    Starship[i].hy = convoy[i].hy * FPSCALE;
-    Starship[i].state = S_ALIEN_PREPARE;
-    Starship[i].prepare = convoy[i].prepare * CONVOY_DISTANCE / SPEED;
-    Starship[i].sprite = 40+i;
-    Starship[i].shape = (convoy[i].alien_type & 3)*4; // shape base, added rotation 0-3
-    Starship[i].path_type = convoy[i].path; // path to follow
-    path = Path_types[Starship[i].path_type].path;
-    Starship[i].a = path[0].a;
-    Starship[i].v = path[0].v;
-    Starship[i].path_state = 0;
-    Starship[i].path_count = path[0].n;
+    s = find_free();
+    if(s == NULL)
+      return;
+    Alien_count++;
+    s->x = convoy[i].x * FPSCALE; // where it will enter screen
+    s->y = convoy[i].y * FPSCALE;
+    s->hx = convoy[i].hx * FPSCALE; // fleet home position
+    s->hy = convoy[i].hy * FPSCALE;
+    s->state = S_ALIEN_PREPARE;
+    s->prepare = convoy[i].prepare * CONVOY_DISTANCE / SPEED;
+    s->shape = (convoy[i].alien_type & 3)*4; // shape base, added rotation 0-3
+    s->path_type = convoy[i].path; // path to follow
+    path = Path_types[s->path_type].path;
+    s->a = path[0].a;
+    s->v = path[0].v;
+    s->path_state = 0;
+    s->path_count = path[0].n;
   }
 }
 
@@ -539,8 +548,10 @@ struct starship *alien_hit(struct starship *s)
   int xr = 4*FPSCALE, yr = 8*FPSCALE; // collision range
   for(i = 0; i < SHIPS_MAX; i++)
   {
+    #if 0
     if( convoy[i].alien_type == -1)
       return NULL; // abort for-loop --- todo this must be done better
+    #endif
     as = &(Starship[i]);
     // is this ship alien alive?
     if(as->state >= S_ALIEN_CONVOY && as->state <= S_ALIEN_ATTACK)
@@ -561,6 +572,8 @@ void missile_move(struct starship *s)
     ah->state = S_NONE;
     // todo: create alien explosion
     c2.Sprite[ah->sprite]->y = 640; // alien off-screen, invisible
+    if(Alien_count > 0)
+      Alien_count--;
   }
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE || ah != NULL)
   {
@@ -761,9 +774,6 @@ void fleet_select_attack()
     // selected group and are in FLEET HOME state
     for(i = 0; i < SHIPS_MAX; i++)
     {
-      if(convoy[i].alien_type == -1)
-        return; // no more ships --- todo this must be done better
-
       if(Starship[i].state == S_ALIEN_HOME && convoy[i].group == group)
       {
         // found the candidate for the group attack
@@ -842,7 +852,7 @@ void ship_move(struct starship *s)
 {
   uint16_t rng = rand();
   static int xdir = SPEED*FPSCALE/2; // x-direction that ship moves
-  if(rng < 2000)
+  if(rng < 6000)
   {
     missile_create(Ship.x+4*FPSCALE, Ship.y);
   }
@@ -896,7 +906,8 @@ void setup()
   c2.alloc_sprites(SPRITE_MAX);
   create_sine_table();
   create_atan_table();
-  create_aliens();
+  allocate_ships();
+  // create_aliens();
 
   #if 1
     for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
@@ -942,6 +953,8 @@ void loop()
 {
   int i;
 
+  if(Alien_count <= 0)
+    create_aliens();
   fleet_move();
   fleet_select_attack();
   for(i = 0; i < SHIPS_MAX; i++)
