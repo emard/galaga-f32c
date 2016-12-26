@@ -538,7 +538,6 @@ void missile_move(struct starship *s)
   object_angular_move(s);
 }
 
-
 // calculate next frame x y for the starship
 // reshape=0 -> do not change shape on direction change
 void alien_convoy(struct starship *s)
@@ -750,7 +749,6 @@ void fleet_select_attack()
 
 }
 
-
 void fleet_move()
 {
   if(Fleet.x <= Fleet.xmin)
@@ -807,7 +805,6 @@ void ship_create(int x, int y)
   c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
 
-
 void ship_move(struct starship *s)
 {
   uint16_t rng = rand();
@@ -825,7 +822,6 @@ void ship_move(struct starship *s)
   c2.Sprite[s->sprite]->x = s->x / FPSCALE;
   c2.Sprite[s->sprite]->y = s->y / FPSCALE;
 }
-
 
 void everything_move(struct starship *s)
 {
