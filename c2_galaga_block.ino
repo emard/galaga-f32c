@@ -46,6 +46,7 @@ enum
 int *isin; // sine table for angles 0-255
 uint8_t *iatan; // arctan table 0-FPSCALE
 int Alien_count = 0; // number of aliens on the screen
+int Alien_friendly = 1; // by default aliens are friendly (they don't attack)
 
 struct fleet
 {
@@ -457,6 +458,8 @@ void create_aliens()
   struct path_segment *path;
   struct starship *s;
 
+  Alien_friendly = 1; // start with friendly set of aliens
+
   convoy = Convoy1;
   for(i = 0; i < SHIPS_MAX; i++)
   {
@@ -572,6 +575,7 @@ void missile_move(struct starship *s)
     ah->state = S_NONE;
     // todo: create alien explosion
     c2.Sprite[ah->sprite]->y = 640; // alien off-screen, invisible
+    Alien_friendly = 0;
     if(Alien_count > 0)
       Alien_count--;
   }
@@ -732,26 +736,16 @@ void alien_fleet(struct starship *s)
   c2.Sprite[s->sprite]->x = (Fleet.x + s->hx) / FPSCALE;
   c2.Sprite[s->sprite]->y = (Fleet.y + s->hy) / FPSCALE;
 
-  rng = rand();
-
-  if(rng < 50)
+  if(Alien_friendly == 0)
   {
-    a = aim_bomb_angle(s);
-    if(a != 0)
-      bomb_create(s->x, s->y, a);
-  }
+    rng = rand();
 
-  if(0)
-  if(rng > 50 && rng < 100)
-  {
-    struct path_segment *path;
-    s->path_type = 5+(rng % 7); // 5 is attack path
-    // s->path_type = 11; // force type for testing
-    path = Path_types[s->path_type].path;
-    s->state = S_ALIEN_ATTACK;
-    s->path_state = 0; // 0 resets path to the first segment of the path
-    s->path_count = path[0].n; // contdown of the path segment
-    s->a = path[0].a; // initial angle
+    if(rng < 50)
+    {
+      a = aim_bomb_angle(s);
+      if(a != 0)
+        bomb_create(s->x, s->y, a);
+    }
   }
 }
 
@@ -789,7 +783,6 @@ void fleet_select_attack()
       }
     }
   }
-
 }
 
 void fleet_move()
@@ -850,12 +843,13 @@ void ship_create(int x, int y)
 
 void ship_move(struct starship *s)
 {
-  uint16_t rng = rand();
+  uint32_t rng = rand();
+  int shooting_freq = 3000000;
   static int xdir = SPEED*FPSCALE/2; // x-direction that ship moves
-  if(rng < 6000)
-  {
+  if(Alien_friendly == 0)
+    shooting_freq = 100000000;
+  if(rng < shooting_freq)
     missile_create(Ship.x+4*FPSCALE, Ship.y);
-  }
   if(s->x > 600*FPSCALE && xdir > 0)
     xdir = -SPEED*FPSCALE/2;
   if(s->x < 100*FPSCALE && xdir < 0)
@@ -956,7 +950,8 @@ void loop()
   if(Alien_count <= 0)
     create_aliens();
   fleet_move();
-  fleet_select_attack();
+  if(Alien_friendly == 0)
+    fleet_select_attack();
   for(i = 0; i < SHIPS_MAX; i++)
     everything_move( &(Starship[i]) );
 
