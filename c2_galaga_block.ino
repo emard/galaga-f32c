@@ -47,6 +47,58 @@ int *isin; // sine table for angles 0-255
 uint8_t *iatan; // arctan table 0-FPSCALE
 int Alien_count = 0; // number of aliens on the screen
 int Alien_friendly = 1; // by default aliens are friendly (they don't attack)
+int Missile_wiggle = 0; // 0-3
+
+struct shape_center
+{
+  int x,y;
+};
+
+struct shape_center Scenter[] =
+{
+  // aliens small
+  [0] = { 4, 5}, // right
+  [1] = { 5, 3}, // up
+  [2] = { 3, 6}, // left
+  [3] = { 5, 4}, // down
+  [4] = { 4, 5}, // right
+  [5] = { 5, 3}, // up
+  [6] = { 3, 6}, // left
+  [7] = { 5, 4}, // down
+  // aliens big
+  [8] = {10, 9},   // right
+  [9] = { 9, 5},   // up
+ [10] = { 5, 10},  // left
+ [11] = {10, 6},   // down
+ [12] = {10, 9},   // right
+ [13] = { 9, 5},   // up
+ [14] = { 5, 10},  // left
+ [15] = {10, 6},   // down
+ // radiate
+ [16] = { 1, 1},
+ [17] = { 5, 1},
+ [18] = { 9, 1},
+ [19] = {13, 1},
+ [20] = {17, 1},
+ [21] = {21, 1},
+ // explode
+ [22] = {5, 5},
+ [23] = {9, 9},
+ // missile
+ [24] = {1, 5},
+ [25] = {1, 5},
+ [26] = {1, 5},
+ [27] = {1, 5},
+ // ship signle
+ [28] = {5, 5},
+ [29] = {5, 5},
+ [30] = {5, 5},
+ [31] = {5, 5},
+ // ship double
+ [32] = {9, 5},
+ // bomb
+ [33] = {1, 1},
+};
 
 struct fleet
 {
@@ -70,7 +122,7 @@ struct ship
 
 struct ship Ship =
 {
-  400*FPSCALE,400*FPSCALE // ship coordinates
+  391*FPSCALE,400*FPSCALE // x=392..407 ship coordinates
 };
 
 struct path_segment
@@ -354,13 +406,13 @@ struct convoy Convoy1[] =
 
     {160,260,   3*FLEET_DISTANCE,  1*FLEET_DISTANCE,1,  90+ 0, 1,1 },
     {160,260,   6*FLEET_DISTANCE/2,0*FLEET_DISTANCE,1,  90+ 1, 1,3 },
-    {160,260,   4*FLEET_DISTANCE,  1*FLEET_DISTANCE,1,  90+ 2, 1,1 },
+    {160,260,   4*FLEET_DISTANCE,  1*FLEET_DISTANCE,2,  90+ 2, 1,1 },
     {160,260,   9*FLEET_DISTANCE/2,0*FLEET_DISTANCE,2,  90+ 3, 1,3 },
     {160,260,   5*FLEET_DISTANCE,  1*FLEET_DISTANCE,2,  90+ 4, 1,1 },
     {160,260,   6*FLEET_DISTANCE,  1*FLEET_DISTANCE,3,  90+ 5, 1,1 },
-    {160,260,  12*FLEET_DISTANCE/2,0*FLEET_DISTANCE,3,  90+ 6, 1,3 },
-    {160,260,   7*FLEET_DISTANCE,  1*FLEET_DISTANCE,4,  90+ 7, 1,1 },
-    {160,260,  15*FLEET_DISTANCE/2,0*FLEET_DISTANCE,4,  90+ 8, 1,3 },
+    {160,260,  13*FLEET_DISTANCE/2,0*FLEET_DISTANCE,3,  90+ 6, 1,3 },
+    {160,260,   7*FLEET_DISTANCE,  1*FLEET_DISTANCE,3,  90+ 7, 1,1 },
+    {160,260,  16*FLEET_DISTANCE/2,0*FLEET_DISTANCE,4,  90+ 8, 1,3 },
     {160,260,   8*FLEET_DISTANCE,  1*FLEET_DISTANCE,4,  90+ 9, 1,1 },
 
     {380,  0,   1*FLEET_DISTANCE,4*FLEET_DISTANCE,5, 140+ 1, 3,0 },
@@ -491,8 +543,17 @@ void object_angular_move(struct starship *s)
   uint8_t xa = 64 + s->a;
   s->x += isin[xa] * s->v / FPSCALE; // cos
   s->y -= isin[s->a] * s->v / FPSCALE; // sin
-  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+  if(s->shape < sizeof(Scenter)/sizeof(Scenter[0]))
+  {
+    c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
+    c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
+  }
+  else
+  {
+    // unknown shape - no centering
+    c2.Sprite[s->sprite]->x = s->x / FPSCALE;
+    c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+  }
 }
 
 // bomb starting from x,y, fly at angle a
@@ -507,9 +568,10 @@ void bomb_create(int x, int y, uint8_t a)
   s->a = a;
   s->v = SPEED*FPSCALE*5/4;
   s->state = S_BOMB;
-  c2.sprite_link_content(33, s->sprite);
-  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+  s->shape = 33;
+  c2.sprite_link_content(s->shape, s->sprite);
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
 }
 
 void bomb_move(struct starship *s)
@@ -535,9 +597,10 @@ void missile_create(int x, int y)
   s->a = 64; // fly up
   s->v = 3*SPEED*FPSCALE;
   s->state = S_MISSILE;
-  c2.sprite_link_content(24, s->sprite);
-  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+  s->shape = 24 + Missile_wiggle;
+  c2.sprite_link_content(s->shape, s->sprite);
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
 }
 
 // alien collision
@@ -548,7 +611,7 @@ struct starship *alien_hit(struct starship *s)
   int i;
   struct starship *as;
   struct convoy *convoy = Convoy1;
-  int xr = 4*FPSCALE, yr = 8*FPSCALE; // collision range
+  int xr = 8*FPSCALE, yr = 8*FPSCALE; // collision range
   for(i = 0; i < SHIPS_MAX; i++)
   {
     #if 0
@@ -585,6 +648,8 @@ void missile_move(struct starship *s)
     c2.Sprite[s->sprite]->y = 640; // off-screen, invisible
     return;
   }
+  s->shape = 24 + Missile_wiggle;
+  c2.sprite_link_content(s->shape, s->sprite);
   object_angular_move(s);
 }
 
@@ -602,7 +667,10 @@ void alien_convoy(struct starship *s)
   {
     s->path_count--;
     if(reshape != 0)
-      c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+    {
+      s->shape = (s->shape & ~3) | (((s->a+32)/64) & 3);
+      c2.sprite_link_content(s->shape, s->sprite);
+    }
     object_angular_move(s);
     s->a += path[s->path_state].r; // rotate
   }
@@ -614,7 +682,10 @@ void alien_convoy(struct starship *s)
       s->path_count = path[s->path_state].n;
       s->a = path[s->path_state].a;
       if(reshape != 0)
-        c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+      {
+        s->shape = (s->shape & ~3) | (((s->a+32)/64) & 3);
+        c2.sprite_link_content(s->shape, s->sprite);
+      }
       object_angular_move(s);
       s->a += path[s->path_state].r; // rotate
     }
@@ -677,10 +748,10 @@ void alien_homing(struct starship *s)
     dir = 3; // down
   }
   s->a = dir * 64; // orient alien down
-  // c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
-  c2.sprite_link_content(s->shape + dir, s->sprite); // orient alien down
-  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+  s->shape = (s->shape & ~3) | (dir & 3);
+  c2.sprite_link_content(s->shape, s->sprite); // orient alien down
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
 }
 
 // calculate bomb angle from alien starship to the player's ship 
@@ -691,7 +762,8 @@ uint8_t aim_bomb_angle(struct starship *s)
   int rev = 1;
   int dx, dy;
   uint8_t a;
-  int xadjust = 4*FPSCALE, yadjust = 10*FPSCALE; // x,y-adjustment for uncentered sprites
+  // int xadjust = 4*FPSCALE, yadjust = 10*FPSCALE; // x,y-adjustment for uncentered sprites
+  int xadjust = 0, yadjust = 0;
   int tangent; // tangent value
   // if ship is above alien, can't shoot
   if(Ship.y < s->y)
@@ -733,8 +805,8 @@ void alien_fleet(struct starship *s)
   s->x = Fleet.x + s->hx;
   s->y = Fleet.y + s->hy;
 
-  c2.Sprite[s->sprite]->x = (Fleet.x + s->hx) / FPSCALE;
-  c2.Sprite[s->sprite]->y = (Fleet.y + s->hy) / FPSCALE;
+  c2.Sprite[s->sprite]->x = (Fleet.x + s->hx) / FPSCALE - Scenter[s->shape].x;
+  c2.Sprite[s->sprite]->y = (Fleet.y + s->hy) / FPSCALE - Scenter[s->shape].y;
 
   if(Alien_friendly == 0)
   {
@@ -819,7 +891,8 @@ void alien_attack(struct starship *s)
     s->y = 0; // jump to top of the screen
     s->a = 192; // angle down
     object_angular_move(s); // initial move
-    c2.sprite_link_content(s->shape + (((s->a+32)/64)&3), s->sprite);
+    s->shape = (s->shape & ~3) | (((s->a+32)/64) & 3);
+    c2.sprite_link_content(s->shape, s->sprite);
     s->state = S_ALIEN_HOMING;
   }
 }
@@ -836,9 +909,10 @@ void ship_create(int x, int y)
   s->a = 64; // fly up
   s->v = 0;
   s->state = S_SHIP;
-  c2.sprite_link_content(29, s->sprite);
-  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+  s->shape = 29;
+  c2.sprite_link_content(s->shape, s->sprite);
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
 }
 
 void ship_move(struct starship *s)
@@ -849,15 +923,15 @@ void ship_move(struct starship *s)
   if(Alien_friendly == 0)
     shooting_freq = 100000000;
   if(rng < shooting_freq)
-    missile_create(Ship.x+4*FPSCALE, Ship.y);
+    missile_create(Ship.x, Ship.y);
   if(s->x > 600*FPSCALE && xdir > 0)
     xdir = -SPEED*FPSCALE/2;
   if(s->x < 100*FPSCALE && xdir < 0)
     xdir =  SPEED*FPSCALE/2;
   s->x += xdir;
   Ship.x = s->x; // publish ship's new x coordinate (y stays the same)
-  c2.Sprite[s->sprite]->x = s->x / FPSCALE;
-  c2.Sprite[s->sprite]->y = s->y / FPSCALE;
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
 }
 
 void everything_move(struct starship *s)
@@ -950,6 +1024,7 @@ void loop()
   if(Alien_count <= 0)
     create_aliens();
   fleet_move();
+  Missile_wiggle = (Missile_wiggle + 1) & 3;
   if(Alien_friendly == 0)
     fleet_select_attack();
   for(i = 0; i < SHIPS_MAX; i++)
