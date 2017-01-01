@@ -37,6 +37,9 @@
 // time to reload next ship missile
 #define SHIP_MISSILE_RELOAD 8
 
+// time to reload next ship missile
+#define ALIEN_BOMB_RELOAD 8
+
 Compositing c2;
 
 // starship states
@@ -370,7 +373,7 @@ struct starship
   uint8_t a; // current angle of movement
   int v; // the speed (usually SPEED*FPSCALE). 1*FPSCALE -> 1 pixel per frame
   int state; // the state number
-  int prepare; // prepare countdown
+  int prepare; // prepare countdown (also shooting reload)
   int sprite; // sprite number which is used to display this starship
   int shape; // sprite base carrying the shape
   int path_type; // current path type
@@ -874,11 +877,19 @@ void alien_fleet(struct starship *s)
   {
     rng = rand();
 
-    if(rng < 50)
+    if(rng < 1000)
     {
-      a = aim_bomb_angle(s);
-      if(a != 0)
-        bomb_create(s->x, s->y, a);
+      if(s->prepare > 0)
+        s->prepare--;
+      else
+      {
+        a = aim_bomb_angle(s);
+        if(a != 0)
+        {
+          s->prepare = ALIEN_BOMB_RELOAD;
+          bomb_create(s->x, s->y, a);
+        }
+      }
     }
   }
 }
@@ -936,11 +947,19 @@ void alien_attack(struct starship *s)
   uint16_t rng = rand();
   uint8_t a;
 
-  if(rng < 2000)
+  if(rng < 8000)
   {
-    a = aim_bomb_angle(s);
-    if(a != 0)
-      bomb_create(s->x, s->y, a);
+    if(s->prepare > 0)
+      s->prepare--;
+    else
+    {
+      a = aim_bomb_angle(s);
+      if(a != 0)
+      {
+        s->prepare = ALIEN_BOMB_RELOAD;
+        bomb_create(s->x, s->y, a);
+      }
+    }
   }
 
   s->v = SPEED*FPSCALE;
