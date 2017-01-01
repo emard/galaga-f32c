@@ -459,6 +459,15 @@ struct convoy Convoy_demo[] =
     {  0,0,     0,0,   0, 0,-1} // end (alien type -1)
 };
 
+// explosion particle colors for alien types 0-3
+int Alien_particle[4][4] =
+{
+  { SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_BLUE },
+  { SH_BLOCK_YELLOW, SH_BLOCK_YELLOW, SH_BLOCK_CYAN, SH_BLOCK_RED },
+  { SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_VIOLETT, SH_BLOCK_VIOLETT },
+  { SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_VIOLETT, SH_BLOCK_ORANGE },
+};
+
 void create_sine_table()
 {
   int i;
@@ -564,7 +573,7 @@ void object_angular_move(struct starship *s)
 }
 
 // create N explosion particles flying from x,y
-void explosion_create(int x, int y, uint8_t n)
+void explosion_create(int x, int y, int t, uint8_t n)
 {
   int i;
   for(i = 0; i < n; i++)
@@ -581,7 +590,8 @@ void explosion_create(int x, int y, uint8_t n)
     s->v = 32*sind; // max initial speed
     s->path_count = 16; // countdown to disappear
     s->a = rng >> 16; // random angular direction
-    s->shape = SH_BLOCK_RED + (rng&7); // explosion particle shape
+    // s->shape = SH_BLOCK_RED + (rng&7); // explosion particle shape
+    s->shape = Alien_particle[t & 3][rng & 3];
     c2.sprite_link_content(s->shape, s->sprite);
     object_angular_move(s);
   }
@@ -677,7 +687,7 @@ void missile_move(struct starship *s)
   {
     ah->state = S_NONE;
     c2.Sprite[ah->sprite]->y = OFF_SCREEN; // alien off-screen, invisible
-    explosion_create(s->x, s->y, 64);
+    explosion_create(ah->x, ah->y, ah->shape / 4, 64);
     Alien_friendly = 0;
     if(Alien_count > 0)
       Alien_count--;
