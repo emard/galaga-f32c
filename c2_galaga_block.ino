@@ -60,47 +60,51 @@ struct shape_center
 struct shape_center Scenter[] =
 {
   // aliens small
-  [0] = { 4, 5}, // right
-  [1] = { 5, 3}, // up
-  [2] = { 3, 6}, // left
-  [3] = { 5, 4}, // down
-  [4] = { 4, 5}, // right
-  [5] = { 5, 3}, // up
-  [6] = { 3, 6}, // left
-  [7] = { 5, 4}, // down
+  [SH_ALIEN1R] = { 4, 5}, // right
+  [SH_ALIEN1U] = { 5, 3}, // up
+  [SH_ALIEN1L] = { 3, 6}, // left
+  [SH_ALIEN1D] = { 5, 4}, // down
+  [SH_ALIEN2R] = { 4, 5}, // right
+  [SH_ALIEN2U] = { 5, 3}, // up
+  [SH_ALIEN2L] = { 3, 6}, // left
+  [SH_ALIEN2D] = { 5, 4}, // down
   // aliens big
-  [8] = {10, 9},   // right
-  [9] = { 9, 5},   // up
- [10] = { 5, 10},  // left
- [11] = {10, 6},   // down
- [12] = {10, 9},   // right
- [13] = { 9, 5},   // up
- [14] = { 5, 10},  // left
- [15] = {10, 6},   // down
- // radiate
- [16] = { 1, 1},
- [17] = { 5, 1},
- [18] = { 9, 1},
- [19] = {13, 1},
- [20] = {17, 1},
- [21] = {21, 1},
- // explode
- [22] = {1, 1},
- [23] = {1, 1},
- // missile
- [24] = {1, 5},
- [25] = {1, 5},
- [26] = {1, 5},
- [27] = {1, 5},
- // ship signle
- [28] = {5, 5},
- [29] = {5, 5},
- [30] = {5, 5},
- [31] = {5, 5},
- // ship double
- [32] = {9, 5},
- // bomb
- [33] = {1, 1},
+  [SH_ALIEN3R] = {10, 9},   // right
+  [SH_ALIEN3U] = { 9, 5},   // up
+  [SH_ALIEN3L] = { 5, 10},  // left
+  [SH_ALIEN3D] = {10, 6},   // down
+  [SH_ALIEN4R] = {10, 9},   // right
+  [SH_ALIEN4U] = { 9, 5},   // up
+  [SH_ALIEN4L] = { 5, 10},  // left
+  [SH_ALIEN4D] = {10, 6},   // down
+  // radiate
+  [SH_ALIEN_RADIATE1] = { 1, 1},
+  [SH_ALIEN_RADIATE3] = { 5, 1},
+  [SH_ALIEN_RADIATE5] = { 9, 1},
+  [SH_ALIEN_RADIATE7] = {13, 1},
+  [SH_ALIEN_RADIATE9] = {17, 1},
+  [SH_ALIEN_RADIATE11] = {21, 1},
+  // missile
+  [SH_MISSILE0] = {1, 5},
+  [SH_MISSILE1] = {1, 5},
+  [SH_MISSILE2] = {1, 5},
+  [SH_MISSILE3] = {1, 5},
+  // ship signle
+  [SH_SHIP1R] = {5, 5},
+  [SH_SHIP1U] = {5, 5},
+  [SH_SHIP1L] = {5, 5},
+  [SH_SHIP1D] = {5, 5},
+  // ship double
+  [SH_SHIP2] = {9, 5},
+  // bomb
+  [SH_BLOCK_RED] = {1, 1},
+  [SH_BLOCK_ORANGE] = {1, 1},
+  [SH_BLOCK_YELLOW] = {1, 1},
+  [SH_BLOCK_GREEN] = {1, 1},
+  [SH_BLOCK_CYAN] = {1, 1},
+  [SH_BLOCK_BLUE] = {1, 1},
+  [SH_BLOCK_VIOLETT] = {1, 1},
+  [SH_BLOCK_WHITE] = {1, 1},
 };
 
 struct fleet
@@ -490,7 +494,7 @@ void allocate_ships()
   for(i = 0; i < SHIPS_MAX; i++)
   {
     Starship[i].state = S_NONE;
-    Starship[i].sprite = 40+i;
+    Starship[i].sprite = SH_MAX+i;
   }
 }
 
@@ -577,7 +581,7 @@ void explosion_create(int x, int y, uint8_t n)
     s->v = 32*sind; // max initial speed
     s->path_count = 16; // countdown to disappear
     s->a = rng >> 16; // random angular direction
-    s->shape = 22 + (rng&1); // explosion particle shape
+    s->shape = SH_BLOCK_RED + (rng&7); // explosion particle shape
     c2.sprite_link_content(s->shape, s->sprite);
     object_angular_move(s);
   }
@@ -608,7 +612,7 @@ void bomb_create(int x, int y, uint8_t a)
   s->a = a;
   s->v = SPEED*FPSCALE*5/4;
   s->state = S_BOMB;
-  s->shape = 33;
+  s->shape = SH_BLOCK_WHITE;
   c2.sprite_link_content(s->shape, s->sprite);
   c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
   c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
@@ -637,7 +641,7 @@ void missile_create(int x, int y)
   s->a = 64; // fly up
   s->v = 3*SPEED*FPSCALE;
   s->state = S_MISSILE;
-  s->shape = 24 + Missile_wiggle;
+  s->shape = SH_MISSILE0 + Missile_wiggle;
   c2.sprite_link_content(s->shape, s->sprite);
   c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
   c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
@@ -684,7 +688,7 @@ void missile_move(struct starship *s)
     c2.Sprite[s->sprite]->y = OFF_SCREEN; // off-screen, invisible
     return;
   }
-  s->shape = 24 + Missile_wiggle;
+  s->shape = SH_MISSILE0 + Missile_wiggle;
   c2.sprite_link_content(s->shape, s->sprite);
   object_angular_move(s);
 }
@@ -945,7 +949,7 @@ void ship_create(int x, int y)
   s->a = 64; // fly up
   s->v = 0;
   s->state = S_SHIP;
-  s->shape = 29;
+  s->shape = SH_SHIP1U;
   c2.sprite_link_content(s->shape, s->sprite);
   c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
   c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
@@ -1020,7 +1024,7 @@ void setup()
     for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
       c2.shape_to_sprite(&Shape[i]);
     for(i = c2.n_sprites; i < c2.sprite_max; i++)
-      c2.sprite_clone(34); // sprite 34 is big enough to allow reshaping with smaller ones
+      c2.sprite_clone(SH_PLACEHOLDER); // shape is big enough to allow reshaping with smaller ones
     for(i = 0; i < c2.n_sprites; i++)
     {
       c2.Sprite[i]->x = 0 + 32*(i&3);
