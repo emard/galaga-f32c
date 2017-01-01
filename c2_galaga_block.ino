@@ -685,12 +685,21 @@ void missile_move(struct starship *s)
   struct starship *ah = alien_hit(s);
   if(ah != NULL)
   {
-    ah->state = S_NONE;
-    c2.Sprite[ah->sprite]->y = OFF_SCREEN; // alien off-screen, invisible
-    explosion_create(ah->x, ah->y, ah->shape / 4, 64);
+    int alien_type = ah->shape / 4;
+    if(alien_type == 3)
+    {
+      ah->shape -= 4; // change to big alien type 2
+      c2.sprite_link_content(ah->shape, ah->sprite);
+    }
+    else
+    {
+      ah->state = S_NONE;
+      c2.Sprite[ah->sprite]->y = OFF_SCREEN; // alien off-screen, invisible
+      if(Alien_count > 0)
+        Alien_count--;
+    }
+    explosion_create(ah->x, ah->y, alien_type, 64);
     Alien_friendly = 0;
-    if(Alien_count > 0)
-      Alien_count--;
   }
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE || ah != NULL)
   {
