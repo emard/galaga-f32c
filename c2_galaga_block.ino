@@ -4,11 +4,11 @@
 #include <Compositing.h>
 #include "shapes.h"
 
-#define SPRITE_MAX 160
+#define SPRITE_MAX 512
 #define N_SHAPES (sizeof(Shape)/sizeof(Shape[0]))
 
 // max number of objects on the screen
-#define SHIPS_MAX 100
+#define SHIPS_MAX (SPRITE_MAX-N_SHAPES)
 
 // fixed point scale
 #define FPSCALE 256
@@ -31,6 +31,9 @@
 // showcase all sprites on the left (debug)
 #define SHOWCASE_SPRITES 0
 
+// off-screen y
+#define OFF_SCREEN 2048
+
 Compositing c2;
 
 // starship states
@@ -40,7 +43,7 @@ enum
   S_ALIEN_PREPARE,
   S_ALIEN_CONVOY, S_ALIEN_HOMING, S_ALIEN_HOME, S_ALIEN_ATTACK,
   S_ALIEN_EXPLODING, S_ALIEN_DEAD,
-  S_BOMB, S_MISSILE, S_SHIP,
+  S_BOMB, S_MISSILE, S_EXPLOSION, S_SHIP,
 };
 
 int *isin; // sine table for angles 0-255
@@ -53,7 +56,7 @@ struct shape_center
 {
   int x,y;
 };
-
+// center pixel x,y coordinates for each shape:
 struct shape_center Scenter[] =
 {
   // aliens small
@@ -82,8 +85,8 @@ struct shape_center Scenter[] =
  [20] = {17, 1},
  [21] = {21, 1},
  // explode
- [22] = {5, 5},
- [23] = {9, 9},
+ [22] = {1, 1},
+ [23] = {1, 1},
  // missile
  [24] = {1, 5},
  [25] = {1, 5},
@@ -556,6 +559,43 @@ void object_angular_move(struct starship *s)
   }
 }
 
+// create N explosion particles flying from x,y
+void explosion_create(int x, int y, uint8_t n)
+{
+  int i;
+  for(i = 0; i < n; i++)
+  {
+    struct starship *s;
+    s = find_free();
+    if(s == NULL)
+      return;
+    uint32_t rng = rand();
+    s->state = S_EXPLOSION;
+    s->x = x;
+    s->y = y;
+    int sind = isin[rng&255]; // sine distribution
+    s->v = 32*sind; // max initial speed
+    s->path_count = 16; // countdown to disappear
+    s->a = rng >> 16; // random angular direction
+    s->shape = 22 + (rng&1); // explosion particle shape
+    c2.sprite_link_content(s->shape, s->sprite);
+    object_angular_move(s);
+  }
+}
+
+// move explosion particles
+void explosion_move(struct starship *s)
+{
+  if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE
+  || --s->path_count < 0)
+  {
+    s->state = S_NONE;
+    c2.Sprite[s->sprite]->y = OFF_SCREEN; // off-screen, invisible
+    return;
+  }
+  object_angular_move(s);
+}
+
 // bomb starting from x,y, fly at angle a
 void bomb_create(int x, int y, uint8_t a)
 {
@@ -579,7 +619,7 @@ void bomb_move(struct starship *s)
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE)
   {
     s->state = S_NONE;
-    c2.Sprite[s->sprite]->y = 640; // off-screen, invisible
+    c2.Sprite[s->sprite]->y = OFF_SCREEN; // off-screen, invisible
     return;
   }
   object_angular_move(s);
@@ -614,10 +654,6 @@ struct starship *alien_hit(struct starship *s)
   int xr = 8*FPSCALE, yr = 8*FPSCALE; // collision range
   for(i = 0; i < SHIPS_MAX; i++)
   {
-    #if 0
-    if( convoy[i].alien_type == -1)
-      return NULL; // abort for-loop --- todo this must be done better
-    #endif
     as = &(Starship[i]);
     // is this ship alien alive?
     if(as->state >= S_ALIEN_CONVOY && as->state <= S_ALIEN_ATTACK)
@@ -636,8 +672,8 @@ void missile_move(struct starship *s)
   if(ah != NULL)
   {
     ah->state = S_NONE;
-    // todo: create alien explosion
-    c2.Sprite[ah->sprite]->y = 640; // alien off-screen, invisible
+    c2.Sprite[ah->sprite]->y = OFF_SCREEN; // alien off-screen, invisible
+    explosion_create(s->x, s->y, 64);
     Alien_friendly = 0;
     if(Alien_count > 0)
       Alien_count--;
@@ -645,7 +681,7 @@ void missile_move(struct starship *s)
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE || ah != NULL)
   {
     s->state = S_NONE;
-    c2.Sprite[s->sprite]->y = 640; // off-screen, invisible
+    c2.Sprite[s->sprite]->y = OFF_SCREEN; // off-screen, invisible
     return;
   }
   s->shape = 24 + Missile_wiggle;
@@ -961,6 +997,9 @@ void everything_move(struct starship *s)
     case S_MISSILE:
       missile_move(s);
       break;
+    case S_EXPLOSION:
+      explosion_move(s);
+      break;
     case S_SHIP:
       ship_move(s);
       break;
@@ -988,7 +1027,7 @@ void setup()
       #if SHOWCASE_SPRITES
       c2.Sprite[i]->y = 0 + 12*i;
       #else
-      c2.Sprite[i]->y = 640; // off screen (invisible)
+      c2.Sprite[i]->y = OFF_SCREEN; // off screen (invisible)
       #endif
     }
   #endif
