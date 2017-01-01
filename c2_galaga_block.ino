@@ -1011,7 +1011,7 @@ int ship_aim(struct starship *s)
 void ship_move(struct starship *s)
 {
   uint32_t rng = rand();
-  int shooting_freq = 10000000;
+  int shooting_freq = 5000000;
   static int xdir = SPEED*FPSCALE/2; // x-direction that ship moves
   if(Alien_friendly == 0)
     shooting_freq = 600000000;
@@ -1026,9 +1026,9 @@ void ship_move(struct starship *s)
       missile_create(Ship.x, Ship.y);
     }
   }
-  if(s->x > 600*FPSCALE && xdir > 0)
+  if((s->x > 600*FPSCALE || s->x > Fleet.x + 240*FPSCALE) && xdir > 0)
     xdir = -SPEED*FPSCALE/2;
-  if(s->x < 100*FPSCALE && xdir < 0)
+  if((s->x < 100*FPSCALE || s->x < Fleet.x + 0*FPSCALE)  && xdir < 0)
     xdir =  SPEED*FPSCALE/2;
   s->x += xdir;
   Ship.x = s->x; // publish ship's new x coordinate (y stays the same)
