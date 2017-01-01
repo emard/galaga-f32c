@@ -34,6 +34,9 @@
 // off-screen y
 #define OFF_SCREEN 2048
 
+// time to reload next ship missile
+#define SHIP_MISSILE_RELOAD 8
+
 Compositing c2;
 
 // starship states
@@ -129,7 +132,7 @@ struct ship
 
 struct ship Ship =
 {
-  391*FPSCALE,400*FPSCALE // x=392..407 ship coordinates
+  391*FPSCALE,400*FPSCALE, // x=392..407 ship coordinates
 };
 
 struct path_segment
@@ -967,6 +970,7 @@ void ship_create(int x, int y)
   s->y = y;
   s->a = 64; // fly up
   s->v = 0;
+  s->prepare = 0;
   s->state = S_SHIP;
   s->shape = SH_SHIP1U;
   c2.sprite_link_content(s->shape, s->sprite);
@@ -980,9 +984,17 @@ void ship_move(struct starship *s)
   int shooting_freq = 3000000;
   static int xdir = SPEED*FPSCALE/2; // x-direction that ship moves
   if(Alien_friendly == 0)
-    shooting_freq = 100000000;
-  if(rng < shooting_freq)
-    missile_create(Ship.x, Ship.y);
+    shooting_freq = 200000000;
+  if(s->prepare > 0)
+    s->prepare--;
+  else
+  {
+    if(rng < shooting_freq)
+    {
+      s->prepare = SHIP_MISSILE_RELOAD;
+      missile_create(Ship.x, Ship.y);
+    }
+  }
   if(s->x > 600*FPSCALE && xdir > 0)
     xdir = -SPEED*FPSCALE/2;
   if(s->x < 100*FPSCALE && xdir < 0)
