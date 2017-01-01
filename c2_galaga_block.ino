@@ -1,5 +1,7 @@
-/* Compositing2 sprite example
- * with some moving vertical color stripes.
+/* f32c Galaga
+ * AUTHOR=EMARD
+ * LICENSE=BSD
+ * Game logic
  */
 #include <Compositing.h>
 #include "shapes.h"

@@ -1,3 +1,8 @@
+/* f32c Galaga
+ * AUTHOR=EMARD
+ * LICENSE=BSD
+ * Artwork, shapes
+ */
 #include <stdlib.h>
 #include "shape.h"
 
