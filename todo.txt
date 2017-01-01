@@ -1,7 +1,10 @@
-[ ] adjust center for all shapes
+[x] adjust center for all shapes
 [ ] multiple level fleet setup struct
 [x] attacking stage
-[ ] attractive explosions, fireballs, firework-ball
+[x] attractive explosions
+[ ] colorize explosion particle like shape
+[ ] fireballs
+[ ] firework-ball
 [x] collision detection
 [x] ship missiles
 [x] alien bombs
@@ -11,3 +14,5 @@
     of them is killed
 [ ] alien abduction for double gun
 [x] alloc new shape (using the free ones)
+[ ] invader-looking fleet
+[x] big alien must be hit twice
