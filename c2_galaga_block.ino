@@ -378,6 +378,7 @@ struct starship
   int prepare; // prepare countdown (also shooting reload)
   int sprite; // sprite number which is used to display this starship
   int shape; // sprite base carrying the shape
+  int group; // group membership for alien attacks
   int path_type; // current path type
   int path_state; // state of the current path
   int path_count; // frame countdown until next path state
@@ -546,6 +547,7 @@ void create_aliens()
     s->prepare = convoy[i].prepare * CONVOY_DISTANCE / SPEED;
     s->shape = (convoy[i].alien_type & 3)*4; // shape base
     s->path_type = convoy[i].path; // path to follow
+    s->group = convoy[i].group;
     path = Path_types[s->path_type].path;
     s->a = path[0].a;
     s->v = path[0].v;
@@ -666,7 +668,7 @@ struct starship *alien_hit(struct starship *s)
   int i;
   struct starship *as;
   // struct convoy *convoy = Convoy1;
-  int xr = 8*FPSCALE, yr = 8*FPSCALE; // collision range
+  int xr = 8*FPSCALE, yr = 12*FPSCALE; // collision range
   for(i = 0; i < SHIPS_MAX; i++)
   {
     as = &(Starship[i]);
@@ -897,18 +899,17 @@ void fleet_select_attack()
   uint32_t rng = rand();
   int group;
   int i;
-  if(rng < 60000000)
+  if(rng < 200000000)
   {
-    struct convoy *convoy = Convoy1;
     group = 1 + (rng % 10); // select which group will attack
-    // group = 1;
     // todo: if no ships are in this group in the fleet,
     // choose next group
     // search for all ships, find those which are members of
     // selected group and are in FLEET HOME state
     for(i = 0; i < SHIPS_MAX; i++)
     {
-      if(Starship[i].state == S_ALIEN_HOME && convoy[i].group == group)
+      // fixme convoy[i] no longer descibes ship's group membership
+      if(Starship[i].state == S_ALIEN_HOME && Starship[i].group == group)
       {
         // found the candidate for the group attack
         struct starship *s = &(Starship[i]);
