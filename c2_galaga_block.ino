@@ -663,7 +663,7 @@ struct starship *alien_hit(struct starship *s)
 {
   int i;
   struct starship *as;
-  struct convoy *convoy = Convoy1;
+  // struct convoy *convoy = Convoy1;
   int xr = 8*FPSCALE, yr = 8*FPSCALE; // collision range
   for(i = 0; i < SHIPS_MAX; i++)
   {
@@ -989,18 +989,38 @@ void ship_create(int x, int y)
   c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
 }
 
+// search for possible alien above
+int ship_aim(struct starship *s)
+{
+  int i;
+  struct starship *as;
+  int xr = 32*FPSCALE; // shooting range
+  for(i = 0; i < SHIPS_MAX; i++)
+  {
+    as = &(Starship[i]);
+    // is this ship alien alive?
+    if(as->state >= S_ALIEN_CONVOY && as->state <= S_ALIEN_ATTACK)
+    {
+      if(as->x - xr < s->x && as->x + xr > s->x)
+        return 1;
+    }
+  }
+  return 0;
+}
+
 void ship_move(struct starship *s)
 {
   uint32_t rng = rand();
-  int shooting_freq = 3000000;
+  int shooting_freq = 10000000;
   static int xdir = SPEED*FPSCALE/2; // x-direction that ship moves
   if(Alien_friendly == 0)
-    shooting_freq = 200000000;
+    shooting_freq = 600000000;
   if(s->prepare > 0)
     s->prepare--;
   else
   {
     if(rng < shooting_freq)
+    if(ship_aim(s) != 0)
     {
       s->prepare = SHIP_MISSILE_RELOAD;
       missile_create(Ship.x, Ship.y);
