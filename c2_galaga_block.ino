@@ -480,15 +480,8 @@ void create_sine_table()
   isin = (int) malloc(256 * sizeof(int));
   for(i = 0; i < 256; i++)
     isin[i] = sin(i * 2.0 * M_PI / 256.0) * (1.0*FPSCALE) + 0.5;
-  // sine calculation is suspected to have some
-  // probably C math library problem
-  // like some values are sometimes calculated wrong.
-  // printing sine table seems it is OK
-  // probably we have bugs in another place.
-  // bug manifests as sometimes angular values for X are wrong
-  // so convoy gets a bit messed up and attack
-  // paths sometimes drift too much to the left 
   #if 0
+  // "Tools->Serial Plotter" should draw sinewave
   for(i = 0; i < 256; i++)
     printf("isin[%d] = %d\n", i, isin[i]);
   #endif
@@ -549,7 +542,7 @@ void create_aliens()
     s->hy = convoy[i].hy * FPSCALE;
     s->state = S_ALIEN_PREPARE;
     s->prepare = convoy[i].prepare * CONVOY_DISTANCE / SPEED;
-    s->shape = (convoy[i].alien_type & 3)*4; // shape base, added rotation 0-3
+    s->shape = (convoy[i].alien_type & 3)*4; // shape base
     s->path_type = convoy[i].path; // path to follow
     path = Path_types[s->path_type].path;
     s->a = path[0].a;
@@ -596,7 +589,7 @@ void explosion_create(int x, int y, int t, uint8_t n)
     s->v = 32*sind; // max initial speed
     s->path_count = 16; // countdown to disappear
     s->a = rng >> 16; // random angular direction
-    // s->shape = SH_BLOCK_RED + (rng&7); // explosion particle shape
+    // s->shape = SH_BLOCK_RED + (rng&7); // explosion with random colorful particles
     s->shape = Alien_particle[t & 3][rng & 3];
     c2.sprite_link_content(s->shape, s->sprite);
     object_angular_move(s);
@@ -919,7 +912,6 @@ void fleet_select_attack()
         struct starship *s = &(Starship[i]);
         struct path_segment *path;
         s->path_type = 5+(rng % 7); // 5 is attack path
-        // s->path_type = 11; // force type for testing
         path = Path_types[s->path_type].path;
         s->state = S_ALIEN_ATTACK;
         s->path_state = 0; // 0 resets path to the first segment of the path
@@ -965,7 +957,7 @@ void alien_attack(struct starship *s)
   s->v = SPEED*FPSCALE;
   if(s->y < 480*FPSCALE)
   {
-    alien_convoy(s); // should be (s,0) but there's some bug in angle?
+    alien_convoy(s);  
   }
   else
   {
@@ -1068,7 +1060,6 @@ void setup()
   create_sine_table();
   create_atan_table();
   allocate_ships();
-  // create_aliens();
 
   #if 1
     for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
