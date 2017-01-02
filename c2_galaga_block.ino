@@ -92,7 +92,14 @@ struct shape_center Scenter[] =
   [SH_ALIEN5U] = { 9, 13},  // up
   [SH_ALIEN5L] = { 5, 10},  // left
   [SH_ALIEN5D] = {10, 14},  // down
-  // radiate
+  // ship single
+  [SH_SHIP1R] = {5, 5},
+  [SH_SHIP1U] = {5, 5},
+  [SH_SHIP1L] = {5, 5},
+  [SH_SHIP1D] = {5, 5},
+  // ship double
+  [SH_SHIP2] = {9, 5},
+  // suction bars
   [SH_ALIEN_SUCTION1] = { 1, 1},
   [SH_ALIEN_SUCTION3] = { 5, 1},
   [SH_ALIEN_SUCTION5] = { 9, 1},
@@ -104,13 +111,6 @@ struct shape_center Scenter[] =
   [SH_MISSILE1] = {1, 5},
   [SH_MISSILE2] = {1, 5},
   [SH_MISSILE3] = {1, 5},
-  // ship signle
-  [SH_SHIP1R] = {5, 5},
-  [SH_SHIP1U] = {5, 5},
-  [SH_SHIP1L] = {5, 5},
-  [SH_SHIP1D] = {5, 5},
-  // ship double
-  [SH_SHIP2] = {9, 5},
   // bomb
   [SH_BLOCK_RED] = {1, 1},
   [SH_BLOCK_ORANGE] = {1, 1},

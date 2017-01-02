@@ -410,6 +410,91 @@ char *shape_alien5r[] =
 NULL
 };
 
+char *shape_ship1u[] =
+{
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+NULL
+};
+
+char *shape_ship1d[] =
+{
+"WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"WWWW    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+"    WWWW",
+NULL
+};
+
+char *shape_ship1l[] =
+{
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"WWWWWWWW",
+"WWWWWWWW",
+"WWWWWWWW",
+"WWWWWWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+NULL
+};
+
+char *shape_ship1r[] =
+{
+"WWWW",
+"WWWW",
+"WWWW",
+"WWWW",
+"    WWWWWWWW",
+"    WWWWWWWW",
+"    WWWWWWWW",
+"    WWWWWWWW",
+"WWWW",
+"WWWW",
+"WWWW",
+"WWWW",
+NULL
+};
+
+char *shape_ship2u[] =
+{
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"WWWW    WWWW    WWWW",
+"WWWW    WWWW    WWWW",
+"WWWW    WWWW    WWWW",
+"WWWW    WWWW    WWWW",
+NULL
+};
+
 char *shape_alien_suction1[] =
 {
 "GGGG",
@@ -537,91 +622,6 @@ char *shape_missile3[] =
 NULL
 };
 
-char *shape_ship1u[] =
-{
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"WWWW    WWWW",
-"WWWW    WWWW",
-"WWWW    WWWW",
-"WWWW    WWWW",
-NULL
-};
-
-char *shape_ship1d[] =
-{
-"WWWW    WWWW",
-"WWWW    WWWW",
-"WWWW    WWWW",
-"WWWW    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-"    WWWW",
-NULL
-};
-
-char *shape_ship1l[] =
-{
-"        WWWW",
-"        WWWW",
-"        WWWW",
-"        WWWW",
-"WWWWWWWW",
-"WWWWWWWW",
-"WWWWWWWW",
-"WWWWWWWW",
-"        WWWW",
-"        WWWW",
-"        WWWW",
-"        WWWW",
-NULL
-};
-
-char *shape_ship1r[] =
-{
-"WWWW",
-"WWWW",
-"WWWW",
-"WWWW",
-"    WWWWWWWW",
-"    WWWWWWWW",
-"    WWWWWWWW",
-"    WWWWWWWW",
-"WWWW",
-"WWWW",
-"WWWW",
-"WWWW",
-NULL
-};
-
-char *shape_ship2u[] =
-{
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"    WWWW    WWWW",
-"WWWW    WWWW    WWWW",
-"WWWW    WWWW    WWWW",
-"WWWW    WWWW    WWWW",
-"WWWW    WWWW    WWWW",
-NULL
-};
-
 char *shape_block_red[] =
 {
 "RRRR",
@@ -734,10 +734,10 @@ enum
   SH_ALIEN3R=8,  SH_ALIEN3U, SH_ALIEN3L, SH_ALIEN3D,
   SH_ALIEN4R=12, SH_ALIEN4U, SH_ALIEN4L, SH_ALIEN4D,
   SH_ALIEN5R=16, SH_ALIEN5U, SH_ALIEN5L, SH_ALIEN5D,
-  SH_ALIEN_SUCTION1=20, SH_ALIEN_SUCTION3, SH_ALIEN_SUCTION5, SH_ALIEN_SUCTION7, SH_ALIEN_SUCTION9 ,SH_ALIEN_SUCTION11,
-  SH_MISSILE0=26, SH_MISSILE1, SH_MISSILE2, SH_MISSILE3,
-  SH_SHIP1R=30, SH_SHIP1U, SH_SHIP1L, SH_SHIP1D, SH_SHIP2,
-  SH_BLOCK_RED=35, SH_BLOCK_ORANGE, SH_BLOCK_YELLOW, SH_BLOCK_GREEN, SH_BLOCK_CYAN, SH_BLOCK_BLUE, SH_BLOCK_VIOLETT, SH_BLOCK_WHITE,
+  SH_SHIP1R=20, SH_SHIP1U, SH_SHIP1L, SH_SHIP1D, SH_SHIP2,
+  SH_ALIEN_SUCTION1, SH_ALIEN_SUCTION3, SH_ALIEN_SUCTION5, SH_ALIEN_SUCTION7, SH_ALIEN_SUCTION9, SH_ALIEN_SUCTION11,
+  SH_MISSILE0, SH_MISSILE1, SH_MISSILE2, SH_MISSILE3,
+  SH_BLOCK_RED, SH_BLOCK_ORANGE, SH_BLOCK_YELLOW, SH_BLOCK_GREEN, SH_BLOCK_CYAN, SH_BLOCK_BLUE, SH_BLOCK_VIOLETT, SH_BLOCK_WHITE,
   SH_PLACEHOLDER,
   SH_MAX
 };
@@ -769,6 +769,12 @@ struct shape Shape[] =
   [SH_ALIEN5L] = { std_colors, shape_alien5l },
   [SH_ALIEN5D] = { std_colors, shape_alien5d },
 
+  [SH_SHIP1R] = { std_colors, shape_ship1r },
+  [SH_SHIP1U] = { std_colors, shape_ship1u },
+  [SH_SHIP1L] = { std_colors, shape_ship1l },
+  [SH_SHIP1D] = { std_colors, shape_ship1d },
+  [SH_SHIP2]  = { std_colors, shape_ship2u },
+
   [SH_ALIEN_SUCTION1]  = { std_colors, shape_alien_suction1 },
   [SH_ALIEN_SUCTION3]  = { std_colors, shape_alien_suction3 },
   [SH_ALIEN_SUCTION5]  = { std_colors, shape_alien_suction5 },
@@ -780,12 +786,6 @@ struct shape Shape[] =
   [SH_MISSILE1] = { std_colors, shape_missile1 },
   [SH_MISSILE2] = { std_colors, shape_missile2 },
   [SH_MISSILE3] = { std_colors, shape_missile3 },
-
-  [SH_SHIP1R] = { std_colors, shape_ship1r },
-  [SH_SHIP1U] = { std_colors, shape_ship1u },
-  [SH_SHIP1L] = { std_colors, shape_ship1l },
-  [SH_SHIP1D] = { std_colors, shape_ship1d },
-  [SH_SHIP2]  = { std_colors, shape_ship2u },
 
   [SH_BLOCK_RED] = { std_colors, shape_block_red },
   [SH_BLOCK_ORANGE] = { std_colors, shape_block_orange },
