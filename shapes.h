@@ -310,6 +310,106 @@ char *shape_alien4r[] =
 NULL
 };
 
+char *shape_alien5u[] =
+{
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"    OOOOYYYYOOOO",
+"    OOOOYYYYOOOO",
+"    OOOOYYYYOOOO",
+"    OOOOYYYYOOOO",
+"GGGG    WWWW    GGGG",
+"GGGG    WWWW    GGGG",
+"GGGG    WWWW    GGGG",
+"GGGG    WWWW    GGGG",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+NULL
+};
+
+char *shape_alien5d[] =
+{
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"    WWWW    WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"GGGG    WWWW    GGGG",
+"GGGG    WWWW    GGGG",
+"GGGG    WWWW    GGGG",
+"GGGG    WWWW    GGGG",
+"    OOOOYYYYOOOO",
+"    OOOOYYYYOOOO",
+"    OOOOYYYYOOOO",
+"    OOOOYYYYOOOO",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+"        WWWW",
+NULL
+};
+
+char *shape_alien5l[] =
+{
+"        GGGG",
+"        GGGG",
+"        GGGG",
+"        GGGG",
+"    OOOO        WWWW",
+"    OOOO        WWWW",
+"    OOOO        WWWW",
+"    OOOO        WWWW",
+"WWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWW",
+"WWWWWWWWWWWWWWWW",
+"    OOOO        WWWW",
+"    OOOO        WWWW",
+"    OOOO        WWWW",
+"    OOOO        WWWW",
+"        GGGG",
+"        GGGG",
+"        GGGG",
+"        GGGG",
+NULL
+};
+
+char *shape_alien5r[] =
+{
+"        GGGG",
+"        GGGG",
+"        GGGG",
+"        GGGG",
+"WWWW        OOOO",
+"WWWW        OOOO",
+"WWWW        OOOO",
+"WWWW        OOOO",
+"    WWWWWWWWWWWWWWWW",
+"    WWWWWWWWWWWWWWWW",
+"    WWWWWWWWWWWWWWWW",
+"    WWWWWWWWWWWWWWWW",
+"WWWW        OOOO",
+"WWWW        OOOO",
+"WWWW        OOOO",
+"WWWW        OOOO",
+"        GGGG",
+"        GGGG",
+"        GGGG",
+"        GGGG",
+NULL
+};
+
 char *shape_alien_radiate1[] =
 {
 "GGGG",
@@ -633,10 +733,11 @@ enum
   SH_ALIEN2R=4,  SH_ALIEN2U, SH_ALIEN2L, SH_ALIEN2D,
   SH_ALIEN3R=8,  SH_ALIEN3U, SH_ALIEN3L, SH_ALIEN3D,
   SH_ALIEN4R=12, SH_ALIEN4U, SH_ALIEN4L, SH_ALIEN4D,
-  SH_ALIEN_RADIATE1=16, SH_ALIEN_RADIATE3, SH_ALIEN_RADIATE5, SH_ALIEN_RADIATE7, SH_ALIEN_RADIATE9 ,SH_ALIEN_RADIATE11,
-  SH_MISSILE0=22, SH_MISSILE1, SH_MISSILE2, SH_MISSILE3,
-  SH_SHIP1R=26, SH_SHIP1U, SH_SHIP1L, SH_SHIP1D, SH_SHIP2,
-  SH_BLOCK_RED=31, SH_BLOCK_ORANGE, SH_BLOCK_YELLOW, SH_BLOCK_GREEN, SH_BLOCK_CYAN, SH_BLOCK_BLUE, SH_BLOCK_VIOLETT, SH_BLOCK_WHITE,
+  SH_ALIEN5R=16, SH_ALIEN5U, SH_ALIEN5L, SH_ALIEN5D,
+  SH_ALIEN_RADIATE1=20, SH_ALIEN_RADIATE3, SH_ALIEN_RADIATE5, SH_ALIEN_RADIATE7, SH_ALIEN_RADIATE9 ,SH_ALIEN_RADIATE11,
+  SH_MISSILE0=26, SH_MISSILE1, SH_MISSILE2, SH_MISSILE3,
+  SH_SHIP1R=30, SH_SHIP1U, SH_SHIP1L, SH_SHIP1D, SH_SHIP2,
+  SH_BLOCK_RED=35, SH_BLOCK_ORANGE, SH_BLOCK_YELLOW, SH_BLOCK_GREEN, SH_BLOCK_CYAN, SH_BLOCK_BLUE, SH_BLOCK_VIOLETT, SH_BLOCK_WHITE,
   SH_PLACEHOLDER,
   SH_MAX
 };
@@ -662,6 +763,11 @@ struct shape Shape[] =
   [SH_ALIEN4U] = { std_colors, shape_alien4u },
   [SH_ALIEN4L] = { std_colors, shape_alien4l },
   [SH_ALIEN4D] = { std_colors, shape_alien4d },
+
+  [SH_ALIEN5R] = { std_colors, shape_alien5r },
+  [SH_ALIEN5U] = { std_colors, shape_alien5u },
+  [SH_ALIEN5L] = { std_colors, shape_alien5l },
+  [SH_ALIEN5D] = { std_colors, shape_alien5d },
 
   [SH_ALIEN_RADIATE1]  = { std_colors, shape_alien_radiate1 },
   [SH_ALIEN_RADIATE3]  = { std_colors, shape_alien_radiate3 },

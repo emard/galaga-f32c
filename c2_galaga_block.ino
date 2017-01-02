@@ -88,6 +88,10 @@ struct shape_center Scenter[] =
   [SH_ALIEN4U] = { 9, 5},   // up
   [SH_ALIEN4L] = { 5, 10},  // left
   [SH_ALIEN4D] = {10, 6},   // down
+  [SH_ALIEN5R] = {10, 9},   // right
+  [SH_ALIEN5U] = { 9, 13},  // up
+  [SH_ALIEN5L] = { 5, 10},  // left
+  [SH_ALIEN5D] = {10, 14},  // down
   // radiate
   [SH_ALIEN_RADIATE1] = { 1, 1},
   [SH_ALIEN_RADIATE3] = { 5, 1},
@@ -438,14 +442,14 @@ struct convoy Convoy1[] =
     {640,290,   9*FLEET_DISTANCE,2*FLEET_DISTANCE,8, 40+ 7, 2,1 },
 
     {160,260,   3*FLEET_DISTANCE,  1*FLEET_DISTANCE,1,  90+ 0, 1,1 },
-    {160,260,   6*FLEET_DISTANCE/2,0*FLEET_DISTANCE,1,  90+ 1, 1,3 },
+    {160,260,   6*FLEET_DISTANCE/2,0*FLEET_DISTANCE,1,  90+ 1, 1,4 },
     {160,260,   4*FLEET_DISTANCE,  1*FLEET_DISTANCE,2,  90+ 2, 1,1 },
     {160,260,   9*FLEET_DISTANCE/2,0*FLEET_DISTANCE,2,  90+ 3, 1,3 },
     {160,260,   5*FLEET_DISTANCE,  1*FLEET_DISTANCE,2,  90+ 4, 1,1 },
     {160,260,   6*FLEET_DISTANCE,  1*FLEET_DISTANCE,3,  90+ 5, 1,1 },
     {160,260,  13*FLEET_DISTANCE/2,0*FLEET_DISTANCE,3,  90+ 6, 1,3 },
     {160,260,   7*FLEET_DISTANCE,  1*FLEET_DISTANCE,3,  90+ 7, 1,1 },
-    {160,260,  16*FLEET_DISTANCE/2,0*FLEET_DISTANCE,4,  90+ 8, 1,3 },
+    {160,260,  16*FLEET_DISTANCE/2,0*FLEET_DISTANCE,4,  90+ 8, 1,4 },
     {160,260,   8*FLEET_DISTANCE,  1*FLEET_DISTANCE,4,  90+ 9, 1,1 },
 
     {380,  0,   1*FLEET_DISTANCE,4*FLEET_DISTANCE,5, 140+ 1, 3,0 },
@@ -488,11 +492,12 @@ struct convoy Convoy_demo[] =
 // explosion particle colors for alien types 0-3
 int Alien_particle[][4] =
 {
-  { SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_BLUE },
-  { SH_BLOCK_YELLOW, SH_BLOCK_YELLOW, SH_BLOCK_CYAN, SH_BLOCK_RED },
-  { SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_VIOLETT, SH_BLOCK_VIOLETT },
-  { SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_VIOLETT, SH_BLOCK_ORANGE },
-  { SH_BLOCK_RED, SH_BLOCK_RED, SH_BLOCK_RED, SH_BLOCK_ORANGE },
+  [0] = { SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_BLUE },
+  [1] = { SH_BLOCK_YELLOW, SH_BLOCK_YELLOW, SH_BLOCK_CYAN, SH_BLOCK_RED },
+  [2] = { SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_VIOLETT, SH_BLOCK_VIOLETT },
+  [3] = { SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_VIOLETT, SH_BLOCK_ORANGE },
+  [4] = { SH_BLOCK_WHITE, SH_BLOCK_WHITE, SH_BLOCK_GREEN, SH_BLOCK_ORANGE },
+  [5] = { SH_BLOCK_RED, SH_BLOCK_RED, SH_BLOCK_RED, SH_BLOCK_ORANGE },
 };
 
 void create_sine_table()
@@ -563,7 +568,7 @@ void create_aliens()
     s->hy = convoy[i].hy * FPSCALE;
     s->state = S_ALIEN_PREPARE;
     s->prepare = convoy[i].prepare * CONVOY_DISTANCE / SPEED;
-    s->shape = (convoy[i].alien_type & 3)*4; // shape base
+    s->shape = (convoy[i].alien_type % 5)*4; // shape base
     s->path_type = convoy[i].path; // path to follow
     s->group = convoy[i].group;
     path = Path_types[s->path_type].path;
@@ -706,7 +711,7 @@ void missile_move(struct starship *s)
   if(ah != NULL)
   {
     int alien_type = ah->shape / 4;
-    if(alien_type == 3)
+    if(alien_type >= 3)
     {
       ah->shape -= 4; // change to big alien type 2
       c2.sprite_link_content(ah->shape, ah->sprite);
@@ -973,7 +978,8 @@ void fleet_select_attack()
         struct path_segment *path;
         s->path_type = 5+((rng / 256) % 8); // 5 is attack path
         // 12 is alien capture path
-        if(s->path_type == PT_ALIEN_CAPTURE && s->shape / 4 != 3) // only big alien type 3 can capture
+        int alien_type = s->shape / 4;
+        if(s->path_type == PT_ALIEN_CAPTURE && alien_type != 3) // only big alien type 3 can capture
           s->path_type = 11; // not big alien, don't capture
         path = Path_types[s->path_type].path;
         s->state = S_ALIEN_ATTACK;
@@ -1092,7 +1098,7 @@ void ship_move(struct starship *s)
   int collision = ship_aim_hit(s);
   if(collision == 1)
   {
-    explosion_create(s->x, s->y, 4, 64); // rich explosion color type 4 (ship)
+    explosion_create(s->x, s->y, 5, 64); // explosion color type 5 (player ship)
     return;
   }
   if(Alien_friendly == 0)
