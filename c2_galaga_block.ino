@@ -327,7 +327,7 @@ struct path_segment alien_attack_zig_zag_big_circle[] =
   {0,0,0} // end
 };
 
-struct path_segment alien_capture[] =
+struct path_segment alien_suction[] =
 {
   {SPEED*FPSCALE,  192, 0,     304/SPEED }, // straight down 304 frames
   {            0,  192, 0,     512/SPEED }, // stop for 512 frames
@@ -343,7 +343,7 @@ struct path_types
 
 enum
 {
-  PT_ALIEN_CAPTURE=12,
+  PT_ALIEN_SUCTION=12,
 };
 
 struct path_types Path_types[] =
@@ -360,7 +360,7 @@ struct path_types Path_types[] =
   [9] = {alien_attack_zig_zag_thru,0}, // go down zig-zag way all way thru
  [10] = {alien_attack_zig_zag_small_circle,1}, // go down zig-zag way all way thru
  [11] = {alien_attack_zig_zag_big_circle,1}, // go down zig-zag way all way thru
- [PT_ALIEN_CAPTURE] = {alien_capture,0}, // go down, stop to capture, continue down
+ [PT_ALIEN_SUCTION] = {alien_suction,0}, // go down, stop to suck, continue down
   {NULL}
 };
 
@@ -806,9 +806,9 @@ void alien_convoy(struct starship *s)
     {
       s->path_state++;
       s->path_count = path[s->path_state].n;
-      if(s->path_type == PT_ALIEN_CAPTURE && path[s->path_state].v == 0) // alien stops to suck
+      if(s->path_type == PT_ALIEN_SUCTION && path[s->path_state].v == 0) // alien stops to suck
         suction_create(s->x, s->y + 20 * FPSCALE);
-      if(s->path_type == PT_ALIEN_CAPTURE && v == 0) // alien restarts after sucking
+      if(s->path_type == PT_ALIEN_SUCTION && v == 0) // alien restarts after sucking
       {
         if(Ship.n == 1)
         {
@@ -990,10 +990,10 @@ void fleet_select_attack()
         struct starship *s = &(Starship[i]);
         struct path_segment *path;
         s->path_type = 5+((rng / 256) % 8); // 5 is attack path
-        // s->path_type = PT_ALIEN_CAPTURE; // force alien capture (debugging)
+        // s->path_type = PT_ALIEN_SUCTION; // force alien suction (debugging)
         int alien_type = s->shape / 4;
-        if(s->path_type == PT_ALIEN_CAPTURE && alien_type != 3) // only big alien type 3 can capture
-          s->path_type = 11; // not big alien, don't capture
+        if(s->path_type == PT_ALIEN_SUCTION && alien_type != 3) // only big alien type 3 can suck
+          s->path_type = 11; // not big alien, don't suck
         path = Path_types[s->path_type].path;
         s->state = S_ALIEN_ATTACK;
         s->path_state = 0; // 0 resets path to the first segment of the path
