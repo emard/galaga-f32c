@@ -93,12 +93,12 @@ struct shape_center Scenter[] =
   [SH_ALIEN5L] = { 5, 10},  // left
   [SH_ALIEN5D] = {10, 14},  // down
   // radiate
-  [SH_ALIEN_RADIATE1] = { 1, 1},
-  [SH_ALIEN_RADIATE3] = { 5, 1},
-  [SH_ALIEN_RADIATE5] = { 9, 1},
-  [SH_ALIEN_RADIATE7] = {13, 1},
-  [SH_ALIEN_RADIATE9] = {17, 1},
-  [SH_ALIEN_RADIATE11] = {21, 1},
+  [SH_ALIEN_SUCTION1] = { 1, 1},
+  [SH_ALIEN_SUCTION3] = { 5, 1},
+  [SH_ALIEN_SUCTION5] = { 9, 1},
+  [SH_ALIEN_SUCTION7] = {13, 1},
+  [SH_ALIEN_SUCTION9] = {17, 1},
+  [SH_ALIEN_SUCTION11] = {21, 1},
   // missile
   [SH_MISSILE0] = {1, 5},
   [SH_MISSILE1] = {1, 5},
@@ -752,7 +752,7 @@ void suction_create(int x, int y)
     s->y = y + i*SUCTION_DISTANCE*FPSCALE;
     s->a = 64; // move up
     s->v = FPSCALE; // one frame at a time
-    s->shape = SH_ALIEN_RADIATE1 + i;
+    s->shape = SH_ALIEN_SUCTION1 + i;
     s->path_state = 0; // y-reset
     s->path_count = (512 - i*SPEED*SUCTION_DISTANCE/4)/SPEED; // suction time
     s->state = S_SUCTION_BAR;

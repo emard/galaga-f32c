@@ -410,7 +410,7 @@ char *shape_alien5r[] =
 NULL
 };
 
-char *shape_alien_radiate1[] =
+char *shape_alien_suction1[] =
 {
 "GGGG",
 "GGGG",
@@ -419,7 +419,7 @@ char *shape_alien_radiate1[] =
 NULL
 };
 
-char *shape_alien_radiate3[] =
+char *shape_alien_suction3[] =
 {
 "GGGGGGGGGGGG",
 "GGGGGGGGGGGG",
@@ -428,7 +428,7 @@ char *shape_alien_radiate3[] =
 NULL
 };
 
-char *shape_alien_radiate5[] =
+char *shape_alien_suction5[] =
 {
 "GGGGGGGGGGGGGGGGGGGG",
 "GGGGGGGGGGGGGGGGGGGG",
@@ -437,7 +437,7 @@ char *shape_alien_radiate5[] =
 NULL
 };
 
-char *shape_alien_radiate7[] =
+char *shape_alien_suction7[] =
 {
 "GGGGGGGGGGGGGGGGGGGGGGGGGGGG",
 "GGGGGGGGGGGGGGGGGGGGGGGGGGGG",
@@ -446,7 +446,7 @@ char *shape_alien_radiate7[] =
 NULL
 };
 
-char *shape_alien_radiate9[] =
+char *shape_alien_suction9[] =
 {
 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
@@ -455,7 +455,7 @@ char *shape_alien_radiate9[] =
 NULL
 };
 
-char *shape_alien_radiate11[] =
+char *shape_alien_suction11[] =
 {
 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
 "GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG",
@@ -734,7 +734,7 @@ enum
   SH_ALIEN3R=8,  SH_ALIEN3U, SH_ALIEN3L, SH_ALIEN3D,
   SH_ALIEN4R=12, SH_ALIEN4U, SH_ALIEN4L, SH_ALIEN4D,
   SH_ALIEN5R=16, SH_ALIEN5U, SH_ALIEN5L, SH_ALIEN5D,
-  SH_ALIEN_RADIATE1=20, SH_ALIEN_RADIATE3, SH_ALIEN_RADIATE5, SH_ALIEN_RADIATE7, SH_ALIEN_RADIATE9 ,SH_ALIEN_RADIATE11,
+  SH_ALIEN_SUCTION1=20, SH_ALIEN_SUCTION3, SH_ALIEN_SUCTION5, SH_ALIEN_SUCTION7, SH_ALIEN_SUCTION9 ,SH_ALIEN_SUCTION11,
   SH_MISSILE0=26, SH_MISSILE1, SH_MISSILE2, SH_MISSILE3,
   SH_SHIP1R=30, SH_SHIP1U, SH_SHIP1L, SH_SHIP1D, SH_SHIP2,
   SH_BLOCK_RED=35, SH_BLOCK_ORANGE, SH_BLOCK_YELLOW, SH_BLOCK_GREEN, SH_BLOCK_CYAN, SH_BLOCK_BLUE, SH_BLOCK_VIOLETT, SH_BLOCK_WHITE,
@@ -769,12 +769,12 @@ struct shape Shape[] =
   [SH_ALIEN5L] = { std_colors, shape_alien5l },
   [SH_ALIEN5D] = { std_colors, shape_alien5d },
 
-  [SH_ALIEN_RADIATE1]  = { std_colors, shape_alien_radiate1 },
-  [SH_ALIEN_RADIATE3]  = { std_colors, shape_alien_radiate3 },
-  [SH_ALIEN_RADIATE5]  = { std_colors, shape_alien_radiate5 },
-  [SH_ALIEN_RADIATE7]  = { std_colors, shape_alien_radiate7 },
-  [SH_ALIEN_RADIATE9]  = { std_colors, shape_alien_radiate9 },
-  [SH_ALIEN_RADIATE11] = { std_colors, shape_alien_radiate11 },
+  [SH_ALIEN_SUCTION1]  = { std_colors, shape_alien_suction1 },
+  [SH_ALIEN_SUCTION3]  = { std_colors, shape_alien_suction3 },
+  [SH_ALIEN_SUCTION5]  = { std_colors, shape_alien_suction5 },
+  [SH_ALIEN_SUCTION7]  = { std_colors, shape_alien_suction7 },
+  [SH_ALIEN_SUCTION9]  = { std_colors, shape_alien_suction9 },
+  [SH_ALIEN_SUCTION11] = { std_colors, shape_alien_suction11 },
 
   [SH_MISSILE0] = { std_colors, shape_missile0 },
   [SH_MISSILE1] = { std_colors, shape_missile1 },
