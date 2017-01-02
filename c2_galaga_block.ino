@@ -332,6 +332,11 @@ struct path_types
   int orientation; // should the sprite be reshaped (for angular orientation)
 };
 
+enum
+{
+  PT_ALIEN_CAPTURE
+};
+
 struct path_types Path_types[] =
 {
   [0] = {stage1_convoy,1},
@@ -346,7 +351,7 @@ struct path_types Path_types[] =
   [9] = {alien_attack_zig_zag_thru,0}, // go down zig-zag way all way thru
  [10] = {alien_attack_zig_zag_small_circle,1}, // go down zig-zag way all way thru
  [11] = {alien_attack_zig_zag_big_circle,1}, // go down zig-zag way all way thru
- [12] = {alien_capture,0}, // go down, stop, continue down
+ [PT_ALIEN_CAPTURE] = {alien_capture,0}, // go down, stop to capture, continue down
   {NULL}
 };
 
@@ -677,7 +682,6 @@ struct starship *alien_hit(struct starship *s)
 {
   int i;
   struct starship *as;
-  // struct convoy *convoy = Convoy1;
   int xr = 8*FPSCALE, yr = 12*FPSCALE; // collision range
   for(i = 0; i < SHIPS_MAX; i++)
   {
@@ -926,7 +930,7 @@ void fleet_select_attack()
         struct path_segment *path;
         s->path_type = 5+((rng / 256) % 8); // 5 is attack path
         // 12 is alien capture path
-        if(s->path_type == 12 && s->shape / 4 != 3) // only big alien type 3 can capture
+        if(s->path_type == PT_ALIEN_CAPTURE && s->shape / 4 != 3) // only big alien type 3 can capture
           s->path_type = 11; // not big alien, don't capture
         path = Path_types[s->path_type].path;
         s->state = S_ALIEN_ATTACK;
