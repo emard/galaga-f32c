@@ -409,6 +409,8 @@ struct starship
 };
 struct starship *Starship;
 
+struct starship *Fighter; // direct pointer to player's ship
+
 // defines which members of convoy are to enter the stage
 // their flight path and their position in the fleet
 struct convoy
@@ -804,8 +806,17 @@ void alien_convoy(struct starship *s)
     {
       s->path_state++;
       s->path_count = path[s->path_state].n;
-      if(s->path_type == PT_ALIEN_CAPTURE && path[s->path_state].v == 0)
+      if(s->path_type == PT_ALIEN_CAPTURE && path[s->path_state].v == 0) // alien stops to suck
         suction_create(s->x, s->y + 20 * FPSCALE);
+      if(s->path_type == PT_ALIEN_CAPTURE && v == 0) // alien restarts after sucking
+      {
+        if(Ship.n == 1)
+        {
+          Ship.n = 2; // double ship
+          Fighter->shape = SH_SHIP2; // double ship shape
+          c2.sprite_link_content(Fighter->shape, Fighter->sprite);
+        }
+      }
       s->a = path[s->path_state].a;
       if(reshape != 0)
       {
@@ -979,7 +990,7 @@ void fleet_select_attack()
         struct starship *s = &(Starship[i]);
         struct path_segment *path;
         s->path_type = 5+((rng / 256) % 8); // 5 is attack path
-        // 12 is alien capture path
+        // s->path_type = PT_ALIEN_CAPTURE; // force alien capture (debugging)
         int alien_type = s->shape / 4;
         if(s->path_type == PT_ALIEN_CAPTURE && alien_type != 3) // only big alien type 3 can capture
           s->path_type = 11; // not big alien, don't capture
@@ -1048,6 +1059,7 @@ void ship_create(int x, int y)
   s = find_free();
   if(s == NULL)
     return;
+  Fighter = s; // update direct pointer to player's ship
   s->x = x;
   s->y = y;
   s->a = 64; // fly up
