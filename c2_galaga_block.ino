@@ -503,7 +503,7 @@ int Alien_particle[][4] =
 void create_sine_table()
 {
   int i;
-  isin = (int) malloc(256 * sizeof(int));
+  isin = (int *) malloc(256 * sizeof(int));
   for(i = 0; i < 256; i++)
     isin[i] = sin(i * 2.0 * M_PI / 256.0) * (1.0*FPSCALE) + 0.5;
   #if 0
@@ -516,7 +516,7 @@ void create_sine_table()
 void create_atan_table()
 {
   int i;
-  iatan = (int) malloc(FPSCALE * sizeof(int));
+  iatan = (uint8_t *) malloc(FPSCALE * sizeof(int));
   for(i = 0; i < FPSCALE; i++)
     iatan[i] = atan(i * (1.0 / FPSCALE)) * 256.0 / (2 * M_PI) + 0.5;
 }
@@ -1124,44 +1124,25 @@ void ship_move(struct starship *s)
   c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
 }
 
-void everything_move(struct starship *s)
+void nothing_move(struct starship *s)
 {
-  switch(s->state)
-  {
-    case S_NONE:
-      return;
-    case S_ALIEN_PREPARE:
-      alien_prepare(s);
-      break;
-    case S_ALIEN_CONVOY:
-      alien_convoy(s);
-      break;
-    case S_ALIEN_HOMING:
-      alien_homing(s);
-      break;
-    case S_ALIEN_HOME:
-      alien_fleet(s);
-      break;
-    case S_ALIEN_ATTACK:
-      alien_attack(s);
-      break;
-    case S_BOMB:
-      bomb_move(s);
-      break;
-    case S_MISSILE:
-      missile_move(s);
-      break;
-    case S_EXPLOSION:
-      explosion_move(s);
-      break;
-    case S_SHIP:
-      ship_move(s);
-      break;
-    case S_SUCTION_BAR:
-      suction_move(s);
-      break;
-  }
+  return;
 }
+
+void (*jumptable_move[])(struct starship *) =
+{
+  [S_NONE] = nothing_move,
+  [S_ALIEN_PREPARE] = alien_prepare,
+  [S_ALIEN_CONVOY] = alien_convoy,
+  [S_ALIEN_HOMING] = alien_homing,
+  [S_ALIEN_HOME] = alien_fleet,
+  [S_ALIEN_ATTACK] = alien_attack,
+  [S_SUCTION_BAR] = suction_move,
+  [S_BOMB] = bomb_move,
+  [S_MISSILE] = missile_move,
+  [S_EXPLOSION] = explosion_move,
+  [S_SHIP] = ship_move,
+};
 
 void setup()
 {
@@ -1225,7 +1206,10 @@ void loop()
   if(Alien_friendly == 0)
     fleet_select_attack();
   for(i = 0; i < SHIPS_MAX; i++)
-    everything_move( &(Starship[i]) );
+  {
+    struct starship *s = &(Starship[i]);
+    jumptable_move[s->state](s);
+  }
 
   while((*c2.vblank_reg & 0x80) == 0);
   c2.sprite_refresh();
