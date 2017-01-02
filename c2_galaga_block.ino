@@ -42,6 +42,9 @@
 // time to reload next ship missile
 #define ALIEN_BOMB_RELOAD 8
 
+// alien suction bars distance
+#define SUCTION_DISTANCE 12
+
 Compositing c2;
 
 // starship states
@@ -50,7 +53,7 @@ enum
   S_NONE,
   S_ALIEN_PREPARE,
   S_ALIEN_CONVOY, S_ALIEN_HOMING, S_ALIEN_HOME, S_ALIEN_ATTACK,
-  S_ALIEN_EXPLODING, S_ALIEN_DEAD,
+  S_SUCTION_BAR,
   S_BOMB, S_MISSILE, S_EXPLOSION, S_SHIP,
 };
 
@@ -320,7 +323,7 @@ struct path_segment alien_attack_zig_zag_big_circle[] =
 
 struct path_segment alien_capture[] =
 {
-  {SPEED*FPSCALE,  192, 0,     256/SPEED }, // straight down 256 frames
+  {SPEED*FPSCALE,  192, 0,     304/SPEED }, // straight down 304 frames
   {            0,  192, 0,     512/SPEED }, // stop for 512 frames
   {SPEED*FPSCALE,  192, 0,     512/SPEED }, // straight down 512 frames
   {0,0,0} // end
@@ -334,7 +337,7 @@ struct path_types
 
 enum
 {
-  PT_ALIEN_CAPTURE
+  PT_ALIEN_CAPTURE=12,
 };
 
 struct path_types Path_types[] =
@@ -729,6 +732,44 @@ void missile_move(struct starship *s)
   object_angular_move(s);
 }
 
+void suction_create(int x, int y)
+{
+  int i;
+  struct starship *s; // suction bar
+  for(i = 0; i < 6; i++)
+  {
+    s = find_free();
+    if(s == NULL)
+      return;
+    s->x = x;
+    s->y = y + i*SUCTION_DISTANCE*FPSCALE;
+    s->a = 64; // move up
+    s->v = FPSCALE; // one frame at a time
+    s->shape = SH_ALIEN_RADIATE1 + i;
+    s->path_state = 0; // y-reset
+    s->path_count = (512 - i*SPEED*SUCTION_DISTANCE/4)/SPEED; // suction time
+    s->state = S_SUCTION_BAR;
+    c2.sprite_link_content(s->shape, s->sprite); // the suction bar
+  }
+}
+
+void suction_move(struct starship *s)
+{
+  if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE
+  || --s->path_count < 0)
+  {
+    s->state = S_NONE;
+    c2.Sprite[s->sprite]->y = OFF_SCREEN; // off-screen, invisible
+    return;
+  }
+  if( ++s->path_state >= SUCTION_DISTANCE)
+  {
+    s->y += SUCTION_DISTANCE*FPSCALE; // reset y-position of the suction bar
+    s->path_state = 0;
+  }
+  object_angular_move(s);
+}
+
 // calculate next frame x y for the starship
 // reshape=0 -> do not change shape on direction change
 void alien_convoy(struct starship *s)
@@ -756,6 +797,8 @@ void alien_convoy(struct starship *s)
     {
       s->path_state++;
       s->path_count = path[s->path_state].n;
+      if(s->path_type == PT_ALIEN_CAPTURE && path[s->path_state].v == 0)
+        suction_create(s->x, s->y + 20 * FPSCALE);
       s->a = path[s->path_state].a;
       if(reshape != 0)
       {
@@ -1108,6 +1151,9 @@ void everything_move(struct starship *s)
     case S_SHIP:
       ship_move(s);
       break;
+    case S_SUCTION_BAR:
+      suction_move(s);
+      break;
   }
 }
 
@@ -1138,6 +1184,8 @@ void setup()
 
   // create the ship, just to display something
   ship_create(Ship.x, Ship.y);
+
+  // suction_create(320*FPSCALE,200*FPSCALE);
 
   // experimental bomb
   // bomb_create(300*FPSCALE,50*FPSCALE,191);
