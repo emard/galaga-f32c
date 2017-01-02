@@ -140,11 +140,13 @@ struct fleet Fleet =
 struct ship
 {
   int x,y;
+  int n; // 1-single ship, 2-double ship
 };
 
 struct ship Ship =
 {
   391*FPSCALE,400*FPSCALE, // x=392..407 ship coordinates
+  1,
 };
 
 struct path_segment
