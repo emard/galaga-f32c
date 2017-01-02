@@ -1083,7 +1083,17 @@ void ship_create(int x, int y)
   s->v = 0;
   s->prepare = 0;
   s->state = S_SHIP;
+  Ship.x = x;
+  Ship.y = y;
+  #if 1
+  // start with single ship
+  Ship.n = 1;
   s->shape = SH_SHIP1U;
+  #else
+  // start with double ship
+  Ship.n = 2;
+  s->shape = SH_SHIP2;
+  #endif
   c2.sprite_link_content(s->shape, s->sprite);
   c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
   c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
