@@ -717,7 +717,7 @@ void missile_move(struct starship *s)
     int alien_type = ah->shape / 4;
     if(alien_type >= 3)
     {
-      ah->shape -= 4; // change to big alien type 2
+      ah->shape -= 4; // change from big alien type 3 to type 2
       c2.sprite_link_content(ah->shape, ah->sprite);
     }
     else
