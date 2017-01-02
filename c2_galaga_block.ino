@@ -1007,7 +1007,7 @@ void fleet_select_attack()
         struct starship *s = &(Starship[i]);
         struct path_segment *path;
         s->path_type = 5+((rng / 256) % 8); // 5 is attack path
-        // s->path_type = PT_ALIEN_SUCTION; // force alien suction (debugging)
+        s->path_type = PT_ALIEN_SUCTION; // force alien suction (debugging)
         int alien_type = s->shape / 4;
         if(s->path_type == PT_ALIEN_SUCTION && alien_type != 3) // only big alien type 3 can suck
           s->path_type = 11; // not big alien, don't suck
@@ -1129,6 +1129,12 @@ void ship_move(struct starship *s)
   int collision = ship_aim_hit(s);
   if(collision == 1)
   {
+    if(Ship.n == 2) // ship hit: double ship will turn into single ship
+    {
+      Ship.n = 1;
+      s->shape = SH_SHIP1U;
+      c2.sprite_link_content(s->shape, s->sprite);   
+    }
     explosion_create(s->x, s->y, 5, 64); // explosion color type 5 (player ship)
     return;
   }
