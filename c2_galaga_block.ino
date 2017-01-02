@@ -446,14 +446,14 @@ struct convoy Convoy1[] =
     {640,290,   9*FLEET_DISTANCE,2*FLEET_DISTANCE,8, 40+ 7, 2,1 },
 
     {160,260,   3*FLEET_DISTANCE,  1*FLEET_DISTANCE,1,  90+ 0, 1,1 },
-    {160,260,   6*FLEET_DISTANCE/2,0*FLEET_DISTANCE,1,  90+ 1, 1,4 },
+    {160,260,   6*FLEET_DISTANCE/2,0*FLEET_DISTANCE,1,  90+ 1, 1,3 },
     {160,260,   4*FLEET_DISTANCE,  1*FLEET_DISTANCE,2,  90+ 2, 1,1 },
     {160,260,   9*FLEET_DISTANCE/2,0*FLEET_DISTANCE,2,  90+ 3, 1,3 },
     {160,260,   5*FLEET_DISTANCE,  1*FLEET_DISTANCE,2,  90+ 4, 1,1 },
     {160,260,   6*FLEET_DISTANCE,  1*FLEET_DISTANCE,3,  90+ 5, 1,1 },
     {160,260,  13*FLEET_DISTANCE/2,0*FLEET_DISTANCE,3,  90+ 6, 1,3 },
     {160,260,   7*FLEET_DISTANCE,  1*FLEET_DISTANCE,3,  90+ 7, 1,1 },
-    {160,260,  16*FLEET_DISTANCE/2,0*FLEET_DISTANCE,4,  90+ 8, 1,4 },
+    {160,260,  16*FLEET_DISTANCE/2,0*FLEET_DISTANCE,4,  90+ 8, 1,3 },
     {160,260,   8*FLEET_DISTANCE,  1*FLEET_DISTANCE,4,  90+ 9, 1,1 },
 
     {380,  0,   1*FLEET_DISTANCE,4*FLEET_DISTANCE,5, 140+ 1, 3,0 },
@@ -806,15 +806,32 @@ void alien_convoy(struct starship *s)
     {
       s->path_state++;
       s->path_count = path[s->path_state].n;
-      if(s->path_type == PT_ALIEN_SUCTION && path[s->path_state].v == 0) // alien stops to suck
-        suction_create(s->x, s->y + 20 * FPSCALE);
-      if(s->path_type == PT_ALIEN_SUCTION && v == 0) // alien restarts after sucking
+      if(s->path_type == PT_ALIEN_SUCTION)
       {
-        if(Ship.n == 1)
+        if(path[s->path_state].v == 0) // alien stops to suck
         {
-          Ship.n = 2; // double ship
-          Fighter->shape = SH_SHIP2; // double ship shape
-          c2.sprite_link_content(Fighter->shape, Fighter->sprite);
+          int alien_type = s->shape / 4;
+          if(alien_type == 3) // is it still alien type 3? (haven't been hit in meantime)
+            suction_create(s->x, s->y + 20 * FPSCALE); // yes, suck
+          else
+          { // no type 3 alien, skip suction state
+            if( path[s->path_state+1].n > 0 )
+            {
+              s->path_state++;
+              s->path_count = path[s->path_state].n;
+            }
+          }
+        }
+        else if(v == 0) // alien restarts after sucking
+        {
+          if(Ship.n == 1) // currently there's single fighter ship
+          {
+            Ship.n = 2; // double fighter ship
+            Fighter->shape = SH_SHIP2; // double ship shape
+            c2.sprite_link_content(Fighter->shape, Fighter->sprite);
+            s->shape = SH_ALIEN5D; // reshape the alien into big one with suckered ship on the back
+            c2.sprite_link_content(s->shape, s->sprite);
+          }
         }
       }
       s->a = path[s->path_state].a;
