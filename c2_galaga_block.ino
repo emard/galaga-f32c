@@ -54,7 +54,7 @@ enum
   S_ALIEN_PREPARE,
   S_ALIEN_CONVOY, S_ALIEN_HOMING, S_ALIEN_HOME, S_ALIEN_ATTACK,
   S_SUCTION_BAR,
-  S_BOMB, S_MISSILE, S_EXPLOSION, S_SHIP,
+  S_BOMB, S_MISSILE, S_EXPLOSION, S_SHIP, S_FIREBALL
 };
 
 int *isin; // sine table for full circle 0-255 
@@ -120,6 +120,11 @@ struct shape_center Scenter[] =
   [SH_BLOCK_BLUE] = {1, 1},
   [SH_BLOCK_VIOLETT] = {1, 1},
   [SH_BLOCK_WHITE] = {1, 1},
+  // fireball
+  [SH_FIREBALL0] = {32, 32},
+  [SH_FIREBALL1] = {32, 32},
+  [SH_FIREBALL2] = {28, 28},
+  [SH_FIREBALL3] = {20, 20},
 };
 
 struct fleet
@@ -602,6 +607,34 @@ void object_angular_move(struct starship *s)
   }
 }
 
+void fireball_create(int x, int y)
+{
+  struct starship *s = find_free();
+  if(s == NULL)
+    return;
+  s->x = x;
+  s->y = y;
+  s->state = S_FIREBALL;
+  s->shape = SH_FIREBALL0;
+  s->path_count = 0;
+  c2.sprite_link_content(s->shape, s->sprite);
+  c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
+  c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
+}
+
+void fireball_move(struct starship *s)
+{
+  if(++s->shape <= SH_FIREBALL3)
+  {
+    c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
+    c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
+    c2.sprite_link_content(s->shape, s->sprite);
+    return;
+  }
+  s->state = S_NONE;
+  c2.Sprite[s->sprite]->y =  OFF_SCREEN;
+}
+
 // create N explosion particles flying from x,y
 void explosion_create(int x, int y, int t, uint8_t n)
 {
@@ -727,6 +760,7 @@ void missile_move(struct starship *s)
       if(Alien_count > 0)
         Alien_count--;
     }
+    fireball_create(ah->x, ah->y);
     explosion_create(ah->x, ah->y, alien_type, 64);
     Alien_friendly = 0;
   }
@@ -1145,7 +1179,8 @@ void ship_move(struct starship *s)
       s->shape = SH_SHIP1U;
       c2.sprite_link_content(s->shape, s->sprite);   
     }
-    explosion_create(s->x, s->y, 5, 64); // explosion color type 5 (player ship)
+    fireball_create(s->x, s->y);
+    explosion_create(s->x, s->y, 5, 16); // explosion color type 5 (player ship)
     return;
   }
   if(Alien_friendly == 0)
@@ -1195,6 +1230,7 @@ void (*jumptable_move[])(struct starship *) =
   [S_MISSILE] = missile_move,
   [S_EXPLOSION] = explosion_move,
   [S_SHIP] = ship_move,
+  [S_FIREBALL] = fireball_move,
 };
 
 void setup()
