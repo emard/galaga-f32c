@@ -54,7 +54,7 @@ enum
   S_BOMB, S_MISSILE, S_EXPLOSION, S_SHIP,
 };
 
-int *isin; // sine table for angles 0-255
+int *isin; // sine table for full circle 0-255 
 uint8_t *iatan; // arctan table 0-FPSCALE
 int Alien_count = 0; // number of aliens on the screen
 int Alien_friendly = 1; // by default aliens are friendly (they don't attack)
@@ -318,6 +318,14 @@ struct path_segment alien_attack_zig_zag_big_circle[] =
   {0,0,0} // end
 };
 
+struct path_segment alien_capture[] =
+{
+  {SPEED*FPSCALE,  192, 0,     256/SPEED }, // straight down 256 frames
+  {            0,  192, 0,     512/SPEED }, // stop for 512 frames
+  {SPEED*FPSCALE,  192, 0,     512/SPEED }, // straight down 512 frames
+  {0,0,0} // end
+};
+
 struct path_types
 {
   struct path_segment *path;
@@ -338,6 +346,7 @@ struct path_types Path_types[] =
   [9] = {alien_attack_zig_zag_thru,0}, // go down zig-zag way all way thru
  [10] = {alien_attack_zig_zag_small_circle,1}, // go down zig-zag way all way thru
  [11] = {alien_attack_zig_zag_big_circle,1}, // go down zig-zag way all way thru
+ [12] = {alien_capture,0}, // go down, stop, continue down
   {NULL}
 };
 
@@ -915,7 +924,10 @@ void fleet_select_attack()
         // found the candidate for the group attack
         struct starship *s = &(Starship[i]);
         struct path_segment *path;
-        s->path_type = 5+(rng % 7); // 5 is attack path
+        s->path_type = 5+((rng / 256) % 8); // 5 is attack path
+        // 12 is alien capture path
+        if(s->path_type == 12 && s->shape / 4 != 3) // only big alien type 3 can capture
+          s->path_type = 11; // not big alien, don't capture
         path = Path_types[s->path_type].path;
         s->state = S_ALIEN_ATTACK;
         s->path_state = 0; // 0 resets path to the first segment of the path
