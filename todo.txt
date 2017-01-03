@@ -2,8 +2,8 @@
 [ ] multiple level fleet setup struct
 [x] attacking stage
 [x] attractive explosions
-[ ] colorize explosion particle like shape
-[ ] fireballs
+[x] colorize explosion particle like shape
+[ ] double fireballs
 [ ] firework-ball
 [x] collision detection
 [x] ship missiles
