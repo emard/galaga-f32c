@@ -934,95 +934,6 @@ char *shape_fireball3[] =
 NULL
 };
 
-char *shape_placeholder[] =
-{
-"RRRR",
-"RRRR",
-"RRRR",
-"RRRR",
-"OOOO",
-"OOOO",
-"OOOO",
-"OOOO",
-"YYYY",
-"YYYY",
-"YYYY",
-"YYYY",
-"GGGG",
-"GGGG",
-"GGGG",
-"GGGG",
-"CCCC",
-"CCCC",
-"CCCC",
-"CCCC",
-"BBBB",
-"BBBB",
-"BBBB",
-"BBBB",
-"VVVV",
-"VVVV",
-"VVVV",
-"VVVV",
-"RRRR",
-"RRRR",
-"RRRR",
-"RRRR",
-"OOOO",
-"OOOO",
-"OOOO",
-"OOOO",
-"YYYY",
-"YYYY",
-"YYYY",
-"YYYY",
-"GGGG",
-"GGGG",
-"GGGG",
-"GGGG",
-"CCCC",
-"CCCC",
-"CCCC",
-"CCCC",
-"BBBB",
-"BBBB",
-"BBBB",
-"BBBB",
-"VVVV",
-"VVVV",
-"VVVV",
-"VVVV",
-"RRRR",
-"RRRR",
-"RRRR",
-"RRRR",
-"OOOO",
-"OOOO",
-"OOOO",
-"OOOO",
-"YYYY",
-"YYYY",
-"YYYY",
-"YYYY",
-"GGGG",
-"GGGG",
-"GGGG",
-"GGGG",
-"CCCC",
-"CCCC",
-"CCCC",
-"CCCC",
-"BBBB",
-"BBBB",
-"BBBB",
-"BBBB",
-"VVVV",
-"VVVV",
-"VVVV",
-"VVVV",
-NULL
-};
-
 enum
 {
   SH_ALIEN1R=0,  SH_ALIEN1U, SH_ALIEN1L, SH_ALIEN1D,
@@ -1036,7 +947,6 @@ enum
   SH_BLOCK_RED, SH_BLOCK_ORANGE, SH_BLOCK_YELLOW, SH_BLOCK_GREEN, SH_BLOCK_CYAN, SH_BLOCK_BLUE, SH_BLOCK_VIOLETT, SH_BLOCK_WHITE,
   SH_FIREBALL0, SH_FIREBALL1, SH_FIREBALL2, SH_FIREBALL3,
   SH_PLACEHOLDER,
-  SH_MAX
 };
 
 struct shape Shape[] =
@@ -1097,8 +1007,8 @@ struct shape Shape[] =
   [SH_FIREBALL1] = { std_colors, shape_fireball1 },
   [SH_FIREBALL2] = { std_colors, shape_fireball2 },
   [SH_FIREBALL3] = { std_colors, shape_fireball3 },
-  [SH_PLACEHOLDER] = { std_colors, shape_placeholder },
-
-//  [99] = { NULL, NULL }
+  [SH_PLACEHOLDER] = { std_colors, shape_block_white }, 
+  // active sprites initially have SH_PLACEHOLDER and
+  // are dynamically reshaped with other shapes
 };
 

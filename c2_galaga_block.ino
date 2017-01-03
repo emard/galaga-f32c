@@ -537,7 +537,7 @@ void allocate_ships()
   for(i = 0; i < SHIPS_MAX; i++)
   {
     Starship[i].state = S_NONE;
-    Starship[i].sprite = SH_MAX+i;
+    Starship[i].sprite = N_SHAPES+i;
   }
 }
 
@@ -1243,8 +1243,14 @@ void setup()
   allocate_ships();
 
   #if 1
+    // ORIGINAL SHAPE SPRITES
+    // first number of sprites will be used only to carry
+    // original shapes. They will not be displayed
     for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
       c2.shape_to_sprite(&Shape[i]);
+    // CLONED SHAPE SPRITES
+    // rest of the sprites can be displayed they
+    // contain cloned shapes from original shape sprites
     for(i = c2.n_sprites; i < c2.sprite_max; i++)
       c2.sprite_clone(SH_PLACEHOLDER); // shape is big enough to allow reshaping with smaller ones
     for(i = 0; i < c2.n_sprites; i++)
@@ -1301,7 +1307,11 @@ void loop()
   }
 
   while((*c2.vblank_reg & 0x80) == 0);
-  c2.sprite_refresh();
+  #if SHOWCASE_SPRITES
+  c2.sprite_refresh(); // display all sprites, originals and clones
+  #else
+  c2.sprite_refresh(N_SHAPES); // display only clones (faster)
+  #endif
   while((*c2.vblank_reg & 0x80) != 0);
   //delay(400);
 }
