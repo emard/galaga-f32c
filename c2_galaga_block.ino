@@ -742,9 +742,8 @@ struct starship *alien_hit(struct starship *s)
   return NULL; // no alien is hit
 }
 
-void missile_move(struct starship *s)
+void kill_alien(struct starship *ah)
 {
-  struct starship *ah = alien_hit(s);
   if(ah != NULL)
   {
     int alien_type = ah->shape / 4;
@@ -764,6 +763,13 @@ void missile_move(struct starship *s)
     explosion_create(ah->x, ah->y, alien_type, 64);
     Alien_friendly = 0;
   }
+}
+
+void missile_move(struct starship *s)
+{
+  struct starship *ah = alien_hit(s);
+  if(ah != NULL)
+    kill_alien(ah);
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE || ah != NULL)
   {
     s->state = S_NONE;
@@ -1138,7 +1144,7 @@ void ship_create(int x, int y)
 //  0 nothing
 // -1 alien in the x-shooting range
 //  1 ship hit by alien or bomb
-int ship_aim_hit(struct starship *s)
+int ship_aim_hit(struct starship *s, struct starship **alien)
 {
   int i;
   struct starship *as;
@@ -1153,7 +1159,11 @@ int ship_aim_hit(struct starship *s)
     {
       if(as->x - xr < s->x && as->x + xr > s->x
       && as->y - yr < s->y && as->y + yr > s->y)
+      {
+        if(alien != NULL)
+          *alien = as;
         return 1; // alien or bomb near, ship should explode
+      }
     }
     // is the alien above?
     if(as->state >= S_ALIEN_CONVOY && as->state <= S_ALIEN_ATTACK)
@@ -1170,9 +1180,22 @@ void ship_move(struct starship *s)
   uint32_t rng = rand();
   int shooting_freq = 5000000;
   static int xdir = SPEED*FPSCALE/2; // x-direction that ship moves
-  int collision = ship_aim_hit(s);
+  struct starship *object_collided;
+  int collision = ship_aim_hit(s, &object_collided);
   if(collision == 1)
   {
+    if(object_collided)
+    {
+      if(object_collided->state >= S_ALIEN_CONVOY && object_collided->state <= S_ALIEN_ATTACK)
+        kill_alien(object_collided);
+      // if it was not alien but just a bomb, silently remove it
+      // so the ship will not continously keep exploding
+      if(object_collided->state == S_BOMB)
+      {
+        object_collided->state = S_NONE;
+        c2.Sprite[object_collided->y] = OFF_SCREEN;
+      }
+    }
     if(Ship.n == 2) // ship hit: double ship will turn into single ship
     {
       Ship.n = 1;
