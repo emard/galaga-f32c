@@ -121,10 +121,14 @@ struct shape_center Scenter[] =
   [SH_BLOCK_VIOLETT] = {1, 1},
   [SH_BLOCK_WHITE] = {1, 1},
   // fireball
-  [SH_FIREBALL0] = {32, 32},
-  [SH_FIREBALL1] = {32, 32},
-  [SH_FIREBALL2] = {28, 28},
-  [SH_FIREBALL3] = {20, 20},
+  [SH_FIREBALLY0] = {32, 32},
+  [SH_FIREBALLY1] = {32, 32},
+  [SH_FIREBALLY2] = {28, 28},
+  [SH_FIREBALLY3] = {20, 20},
+  [SH_FIREBALLB0] = {32, 32},
+  [SH_FIREBALLB1] = {32, 28},
+  [SH_FIREBALLB2] = {32, 21},
+  [SH_FIREBALLB3] = {32, 21},
 };
 
 struct fleet
@@ -607,7 +611,10 @@ void object_angular_move(struct starship *s)
   }
 }
 
-void fireball_create(int x, int y)
+// initiate 4-frame fireball animaton
+// starting from specified shape.
+// each frame increases shape number
+void fireball_create(int x, int y, int shape)
 {
   struct starship *s = find_free();
   if(s == NULL)
@@ -615,7 +622,7 @@ void fireball_create(int x, int y)
   s->x = x;
   s->y = y;
   s->state = S_FIREBALL;
-  s->shape = SH_FIREBALL0;
+  s->shape = shape;
   s->path_count = 0;
   c2.sprite_link_content(s->shape, s->sprite);
   c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
@@ -624,15 +631,18 @@ void fireball_create(int x, int y)
 
 void fireball_move(struct starship *s)
 {
-  if(++s->shape <= SH_FIREBALL3)
+  if(++s->path_count <= 3)
   {
+    s->shape++;
+    c2.sprite_link_content(s->shape, s->sprite);
     c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
     c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
-    c2.sprite_link_content(s->shape, s->sprite);
-    return;
   }
-  s->state = S_NONE;
-  c2.Sprite[s->sprite]->y =  OFF_SCREEN;
+  else
+  {
+    s->state = S_NONE;
+    c2.Sprite[s->sprite]->y = OFF_SCREEN;
+  }
 }
 
 // create N explosion particles flying from x,y
@@ -759,7 +769,7 @@ void kill_alien(struct starship *ah)
       if(Alien_count > 0)
         Alien_count--;
     }
-    fireball_create(ah->x, ah->y);
+    fireball_create(ah->x, ah->y, alien_type == 0 ? SH_FIREBALLB0 : SH_FIREBALLY0);
     explosion_create(ah->x, ah->y, alien_type, 64);
     Alien_friendly = 0;
   }
@@ -1202,7 +1212,7 @@ void ship_move(struct starship *s)
       s->shape = SH_SHIP1U;
       c2.sprite_link_content(s->shape, s->sprite);   
     }
-    fireball_create(s->x, s->y);
+    fireball_create(s->x, s->y, SH_FIREBALLY0);
     explosion_create(s->x, s->y, 5, 16); // explosion color type 5 (player ship)
     return;
   }
