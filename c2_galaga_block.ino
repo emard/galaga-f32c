@@ -15,7 +15,7 @@
 // fixed point scale
 #define FPSCALE 256
 
-// global speed 1/2/4/8 (more=faster)
+// global speed 1/2/4 (more=faster)
 #define SPEED 4
 
 // fleet drift (more = SLOWER)
@@ -409,7 +409,7 @@ struct starship
   int state; // the state number
   int prepare; // prepare countdown (also shooting reload)
   int sprite; // sprite number which is used to display this starship
-  int shape; // sprite base carrying the shape
+  uint32_t shape; // sprite base carrying the shape
   int group; // group membership for alien attacks
   int path_type; // current path type
   int path_state; // state of the current path
@@ -536,7 +536,7 @@ void create_atan_table()
 
 void allocate_ships()
 {
-  int i;
+  uint32_t i;
   Starship = (struct starship *) malloc(SHIPS_MAX * sizeof(struct starship) );
   for(i = 0; i < SHIPS_MAX; i++)
   {
@@ -547,7 +547,7 @@ void allocate_ships()
 
 struct starship *find_free()
 {
-  int i;
+  uint32_t i;
   for(i = 0; i < SHIPS_MAX; i++)
   {
     if( Starship[i].state == S_NONE )
@@ -558,8 +558,7 @@ struct starship *find_free()
 
 void create_aliens()
 {
-  int i;
-  int path_type;
+  uint32_t i;
   struct convoy *convoy;
   struct path_segment *path;
   struct starship *s;
@@ -735,7 +734,7 @@ void missile_create(int x, int y)
 // to the alien which is hit by the missile s
 struct starship *alien_hit(struct starship *s)
 {
-  int i;
+  uint32_t i;
   struct starship *as;
   int xr = 8*FPSCALE, yr = 12*FPSCALE; // collision range
   for(i = 0; i < SHIPS_MAX; i++)
@@ -833,8 +832,6 @@ void suction_move(struct starship *s)
 // reshape=0 -> do not change shape on direction change
 void alien_convoy(struct starship *s)
 {
-  int v;
-  uint8_t xa;
   struct path_segment *path;
   path = Path_types[s->path_type].path;
   int reshape = Path_types[s->path_type].orientation;
@@ -872,7 +869,7 @@ void alien_convoy(struct starship *s)
             }
           }
         }
-        else if(v == 0) // alien restarts after sucking
+        else if(s->v == 0) // alien restarts after sucking
         {
           if(Ship.n == 1) // currently there's single fighter ship
           {
@@ -910,7 +907,7 @@ void alien_prepare(struct starship *s)
 
 void alien_homing(struct starship *s)
 {
-  int dir;
+  int dir = 192; // default orient down
   int xd, yd;
   xd = Fleet.x + s->hx - s->x;
   yd = Fleet.y + s->hy - s->y;
@@ -951,7 +948,7 @@ void alien_homing(struct starship *s)
     s->y = Fleet.y + s->hy;
     dir = 3; // down
   }
-  s->a = dir * 64; // orient alien down
+  s->a = dir * 64; // orientation of the alien
   s->shape = (s->shape & ~3) | (dir & 3);
   c2.sprite_link_content(s->shape, s->sprite); // orient alien down
   c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
@@ -1040,7 +1037,7 @@ void fleet_select_attack()
 {
   uint32_t rng = rand();
   int group;
-  int i;
+  uint32_t i;
   if(rng < 200000000)
   {
     group = 1 + (rng % 10); // select which group will attack
@@ -1156,7 +1153,7 @@ void ship_create(int x, int y)
 //  1 ship hit by alien or bomb
 int ship_aim_hit(struct starship *s, struct starship **alien)
 {
-  int i;
+  uint32_t i;
   struct starship *as;
   int xs = 32*FPSCALE; // shooting range
   int xr = 12*FPSCALE, yr = 12*FPSCALE; // collision range
@@ -1188,7 +1185,7 @@ int ship_aim_hit(struct starship *s, struct starship **alien)
 void ship_move(struct starship *s)
 {
   uint32_t rng = rand();
-  int shooting_freq = 5000000;
+  uint32_t shooting_freq = 5000000;
   static int xdir = SPEED*FPSCALE/2; // x-direction that ship moves
   struct starship *object_collided;
   int collision = ship_aim_hit(s, &object_collided);
@@ -1203,7 +1200,7 @@ void ship_move(struct starship *s)
       if(object_collided->state == S_BOMB)
       {
         object_collided->state = S_NONE;
-        c2.Sprite[object_collided->y] = OFF_SCREEN;
+        c2.Sprite[object_collided->sprite]->y = OFF_SCREEN;
       }
     }
     if(Ship.n == 2) // ship hit: double ship will turn into single ship
@@ -1279,7 +1276,7 @@ void setup()
     // ORIGINAL SHAPE SPRITES
     // first number of sprites will be used only to carry
     // original shapes. They will not be displayed
-    for(i = 0; i < c2.sprite_max && i < N_SHAPES; i++)
+    for(i = 0; i < c2.sprite_max && i < (int)N_SHAPES; i++)
       c2.shape_to_sprite(&Shape[i]);
     // CLONED SHAPE SPRITES
     // rest of the sprites can be displayed they
@@ -1325,7 +1322,7 @@ void setup()
 
 void loop()
 {
-  int i;
+  uint32_t i;
 
   if(Alien_count <= 0)
     create_aliens();
