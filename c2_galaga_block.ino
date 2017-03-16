@@ -158,6 +158,19 @@ struct ship Ship =
   1,
 };
 
+// easy search that suction is present
+struct suction
+{
+  int x,y;
+  int countdown; // sucks until 0
+};
+
+struct suction Suction =
+{
+  0,0,
+  0,
+};
+
 struct path_segment
 {
   int v; // velocity, v = FPSCALE --> 1 pixel/frame
@@ -790,7 +803,7 @@ void missile_move(struct starship *s)
   object_angular_move(s);
 }
 
-void suction_create(int x, int y)
+void suction_create(struct starship *ship, int x, int y)
 {
   int i;
   struct starship *s; // suction bar
@@ -808,6 +821,19 @@ void suction_create(int x, int y)
     s->path_count = (512 - i*SPEED*SUCTION_DISTANCE/4)/SPEED; // suction time
     s->state = S_SUCTION_BAR;
     c2.sprite_link_content(s->shape, s->sprite); // the suction bar
+  }
+  // suctiion tracker
+  Suction.x = ship->x;
+  Suction.y = ship->y;
+  Suction.countdown = ship->path_count;
+}
+
+// tracks (countdowns) suction time for easier search
+void suction_tracker(void)
+{
+  if(Suction.countdown > 0)
+  {
+    Suction.countdown--;
   }
 }
 
@@ -859,7 +885,9 @@ void alien_convoy(struct starship *s)
         {
           int alien_type = s->shape / 4;
           if(alien_type == 3) // is it still alien type 3? (haven't been hit in meantime)
-            suction_create(s->x, s->y + 20 * FPSCALE); // yes, suck
+          {
+            suction_create(s, s->x, s->y + 20 * FPSCALE); // yes, suck
+          }
           else
           { // no type 3 alien, skip suction state
             if( path[s->path_state+1].n > 0 )
@@ -1151,6 +1179,7 @@ void ship_create(int x, int y)
 //  0 nothing
 // -1 alien in the x-shooting range
 //  1 ship hit by alien or bomb
+//  2 ship sucked by the alien
 int ship_aim_hit(struct starship *s, struct starship **alien)
 {
   uint32_t i;
@@ -1162,18 +1191,23 @@ int ship_aim_hit(struct starship *s, struct starship **alien)
   {
     as = &(Starship[i]);
     // is the alien or bomb near enough to destroy the ship?
-    if((as->state >= S_ALIEN_CONVOY && as->state <= S_ALIEN_ATTACK) || (as->state == S_BOMB))
+    if((as->state >= S_ALIEN_CONVOY && as->state <= S_ALIEN_ATTACK)
+    || (as->state == S_BOMB)
+    || (as->state == S_SUCTION_BAR)
+    )
     {
       if(as->x - xr < s->x && as->x + xr > s->x
       && as->y - yr < s->y && as->y + yr > s->y)
       {
         if(alien != NULL)
           *alien = as;
+        if(as->state == S_SUCTION_BAR)
+          return 2; // suction bar near - ship should be suckered
         return 1; // alien or bomb near, ship should explode
       }
     }
-    // is the alien above?
-    if(as->state >= S_ALIEN_CONVOY && as->state <= S_ALIEN_ATTACK)
+    // is the alien above? (non-sucking one)
+    if(as->state >= S_ALIEN_CONVOY && as->state <= S_ALIEN_ATTACK && as->path_state != PT_ALIEN_SUCTION)
     {
       if(as->x - xs < s->x && as->x + xs > s->x)
         retval = -1; // alien found above, ship should shoot
@@ -1188,8 +1222,10 @@ void ship_move(struct starship *s)
   uint32_t shooting_freq = 5000000;
   static int xdir = SPEED*FPSCALE/2; // x-direction that ship moves
   struct starship *object_collided;
+  static int ydir = 0; // when suckered it will fly above
+  static int suction = 0;
   int collision = ship_aim_hit(s, &object_collided);
-  if(collision == 1)
+  if(collision == 1 && suction == 0) // fatal hit
   {
     if(object_collided)
     {
@@ -1213,6 +1249,12 @@ void ship_move(struct starship *s)
     explosion_create(s->x, s->y, 5, 16); // explosion color type 5 (player ship)
     return;
   }
+  if(collision == 2) // suction
+  {
+    xdir = 0;
+    ydir = -SPEED*FPSCALE; // todo: complete missing states for suckered ship
+    suction = 1;
+  }
   if(Alien_friendly == 0)
     shooting_freq = 600000000;
   if(s->prepare > 0)
@@ -1220,7 +1262,7 @@ void ship_move(struct starship *s)
   else
   {
     if(rng < shooting_freq)
-    if(collision == -1)
+    if(collision == -1) // alien in the x-shooting range
     {
       s->prepare = SHIP_MISSILE_RELOAD;
       if(Ship.n == 1) // single ship shingle shots
@@ -1237,7 +1279,9 @@ void ship_move(struct starship *s)
   if((s->x < 100*FPSCALE || s->x < Fleet.x + 0*FPSCALE)  && xdir < 0)
     xdir =  SPEED*FPSCALE/2;
   s->x += xdir;
+  s->y += ydir;
   Ship.x = s->x; // publish ship's new x coordinate (y stays the same)
+  Ship.y = s->y;
   c2.Sprite[s->sprite]->x = s->x / FPSCALE - Scenter[s->shape].x;
   c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
 }
@@ -1335,6 +1379,7 @@ void loop()
     struct starship *s = &(Starship[i]);
     jumptable_move[s->state](s);
   }
+  suction_tracker();
 
   while((*c2.vblank_reg & 0x80) == 0);
   #if SHOWCASE_SPRITES
