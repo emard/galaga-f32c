@@ -793,7 +793,20 @@ void missile_move(struct starship *s)
 {
   struct starship *ah = alien_hit(s);
   if(ah != NULL)
+  {
+    if(ah->shape == SH_ALIEN5D) // alien hit have suckered ship on the back
+    {
+      if(Ship.n == 1) // if currently there's single fighter ship
+      {
+        Ship.n = 2; // double fighter ship
+        Fighter->shape = SH_SHIP2; // double ship shape
+        c2.sprite_link_content(Fighter->shape, Fighter->sprite);
+        s->shape = SH_ALIEN5D; // reshape the alien into big one with suckered ship on the back
+        c2.sprite_link_content(s->shape, s->sprite);
+      }
+    }
     kill_alien(ah);
+  }
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE || ah != NULL)
   {
     s->state = S_NONE;
@@ -903,9 +916,11 @@ void alien_convoy(struct starship *s)
         {
           if(Ship.n == 1) // currently there's single fighter ship
           {
+#if 0 // not yet
             Ship.n = 2; // double fighter ship
-            Ship.suction = 1; // 1 before end of suction
             Fighter->shape = SH_SHIP2; // double ship shape
+#endif
+            Ship.suction = 1; // 1 before end of suction
             c2.sprite_link_content(Fighter->shape, Fighter->sprite);
             s->shape = SH_ALIEN5D; // reshape the alien into big one with suckered ship on the back
             c2.sprite_link_content(s->shape, s->sprite);
@@ -1085,7 +1100,7 @@ void fleet_select_attack()
         struct starship *s = &(Starship[i]);
         struct path_segment *path;
         s->path_type = 5+((rng / 256) % 8); // 5 is attack path
-        // s->path_type = PT_ALIEN_SUCTION; // force alien suction (debugging)
+        s->path_type = PT_ALIEN_SUCTION; // force alien suction (debugging)
         int alien_type = s->shape / 4;
         if(s->path_type == PT_ALIEN_SUCTION && alien_type != 3) // only big alien type 3 can suck
           s->path_type = 11; // not big alien, don't suck
@@ -1276,7 +1291,7 @@ void ship_move(struct starship *s)
   }
   if(collision == 2) // enter suction state
   {
-    Ship.suction = 200; // counter for the ship to move up
+    Ship.suction = 100; // counter for the ship to move up
     return;
   }
   if(Alien_friendly == 0)
