@@ -145,20 +145,6 @@ struct fleet Fleet =
   SPEED*FPSCALE/FLEET_DRIFT // initial x-dir
 };
 
-// here ship will publish its x/y coordinates
-struct ship
-{
-  int x,y;
-  int n; // 1-single ship, 2-double ship
-  int suction; // suction counter
-};
-
-struct ship Ship =
-{
-  391*FPSCALE,400*FPSCALE, // x=392..407 ship coordinates
-  1, // single ship
-  0, // no suction
-};
 
 // easy search that suction is present
 struct suction
@@ -430,10 +416,27 @@ struct starship
   int path_state; // state of the current path
   int path_count; // frame countdown until next path state
   int hx, hy; // home position in the fleet
+  struct starship *parent; // who created it (from suction bars to the alien)
 };
 struct starship *Starship;
 
 struct starship *Fighter; // direct pointer to player's ship
+
+// here ship will publish its x/y coordinates
+struct ship
+{
+  int x,y;
+  int n; // 1-single ship, 2-double ship
+  int suction; // suction counter
+  struct starship *sucker; // pointer to alien that sucks this ship
+};
+
+struct ship Ship =
+{
+  391*FPSCALE,400*FPSCALE, // x=392..407 ship coordinates
+  1, // single ship
+  0, // no suction
+};
 
 // defines which members of convoy are to enter the stage
 // their flight path and their position in the fleet
@@ -835,6 +838,7 @@ void suction_create(struct starship *ship, int x, int y)
     s->path_state = 0; // y-reset
     s->path_count = (512 - i*SPEED*SUCTION_DISTANCE/4)/SPEED; // suction time
     s->state = S_SUCTION_BAR;
+    s->parent = ship; // the alien ship who created this suction bar
     c2.sprite_link_content(s->shape, s->sprite); // the suction bar
   }
   // suctiion tracker
@@ -1292,6 +1296,11 @@ void ship_move(struct starship *s)
   if(collision == 2) // enter suction state
   {
     Ship.suction = 100; // counter for the ship to move up
+    Ship.sucker = NULL;
+    if(object_collided->state == S_SUCTION_BAR && object_collided->parent != NULL)
+    {
+      Ship.sucker = object_collided->parent; // the alien that sucks this ship
+    }
     return;
   }
   if(Alien_friendly == 0)
