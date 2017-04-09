@@ -918,17 +918,19 @@ void alien_convoy(struct starship *s)
         }
         else if(s->v == 0) // alien restarts after sucking
         {
-          if(Ship.n == 1 && Ship.suction > 0) // currently there's single fighter ship
+#if 0
+          if(Ship.n == 1 && Ship.suction > 0) // currently there's single fighter ship and is sucked
           {
 #if 0 // not yet, alien must be hit for this to happen
             Ship.n = 2; // double fighter ship
             Fighter->shape = SH_SHIP2; // double ship shape
+            c2.sprite_link_content(Fighter->shape, Fighter->sprite);
 #endif
             Ship.suction = 1; // 1 before end of suction
-            c2.sprite_link_content(Fighter->shape, Fighter->sprite);
             s->shape = SH_ALIEN5D; // reshape the alien into big one with suckered ship on the back
             c2.sprite_link_content(s->shape, s->sprite);
           }
+#endif
         }
       }
       s->a = path[s->path_state].a;
@@ -1104,7 +1106,7 @@ void fleet_select_attack()
         struct starship *s = &(Starship[i]);
         struct path_segment *path;
         s->path_type = 5+((rng / 256) % 8); // 5 is attack path
-        s->path_type = PT_ALIEN_SUCTION; // force alien suction (debugging)
+        // s->path_type = PT_ALIEN_SUCTION; // force alien suction (debugging)
         int alien_type = s->shape / 4;
         if(s->path_type == PT_ALIEN_SUCTION && alien_type != 3) // only big alien type 3 can suck
           s->path_type = 11; // not big alien, don't suck
@@ -1248,11 +1250,17 @@ void ship_move(struct starship *s)
   int collision = ship_aim_hit(s, &object_collided);
   if(Ship.suction > 0)
   {
+    int up_to_suction_level = 0;
+    if(Ship.sucker != NULL)
+    {
+      if(s->y < Ship.sucker->y)
+        up_to_suction_level = 1;
+    }
     // ship goes up and joins the sucker alien
     // after joining: if there's another ship available
     // it should enter the game
     Ship.suction--;
-    if(Ship.suction > 0)
+    if(Ship.suction > 0 && up_to_suction_level == 0)
     { // move up
       s->y -= SPEED*FPSCALE/4; // move up at suction speed
       c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
@@ -1260,10 +1268,23 @@ void ship_move(struct starship *s)
       return;
     }
     else
-    { // create new ship (if available) at old position
+    { // inform the sucker to proceed with taking the ship
+      if(Ship.sucker != NULL) // sanity check 
+      {
+      struct path_segment *path;
+      path = Path_types[Ship.sucker->path_type].path;
+      if( path[Ship.sucker->path_state+1].n > 0 )
+      {
+        Ship.sucker->path_state++;
+        Ship.sucker->path_count = path[Ship.sucker->path_state].n;
+        Ship.sucker->shape = SH_ALIEN5D; // reshape the alien into big one with suckered ship on the back
+        c2.sprite_link_content(Ship.sucker->shape, Ship.sucker->sprite);
+      }
+      // create new ship (if available) at old position
       s->y = Ship.y;
       c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
       immunity = 200;
+      }
       return;
     }
   }
@@ -1293,13 +1314,14 @@ void ship_move(struct starship *s)
     explosion_create(s->x, s->y, 5, 16); // explosion color type 5 (player ship)
     return;
   }
-  if(collision == 2) // enter suction state
+  if(collision == 2 && immunity == 0) // enter suction state
   {
     Ship.suction = 100; // counter for the ship to move up
     Ship.sucker = NULL;
     if(object_collided->state == S_SUCTION_BAR && object_collided->parent != NULL)
     {
-      Ship.sucker = object_collided->parent; // the alien that sucks this ship
+      if(object_collided->parent->path_type == PT_ALIEN_SUCTION)
+        Ship.sucker = object_collided->parent; // the alien that sucks this ship
     }
     return;
   }
