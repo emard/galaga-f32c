@@ -1304,7 +1304,7 @@ void ship_move(struct starship *s)
     if(collision == -1) // alien in the x-shooting range
     {
       s->prepare = SHIP_MISSILE_RELOAD;
-      if(Ship.n == 1) // single ship shingle shots
+      if(Ship.n == 1) // single ship single shots
         missile_create(Ship.x, Ship.y);
       if(Ship.n == 2) // double ship double shots
       {
