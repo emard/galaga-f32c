@@ -1269,22 +1269,22 @@ void ship_move(struct starship *s)
     }
     else
     { // inform the sucker to proceed with taking the ship
-      if(Ship.sucker != NULL) // sanity check 
+      if(Ship.sucker != NULL && up_to_suction_level == 1) // sanity check
       {
-      struct path_segment *path;
-      path = Path_types[Ship.sucker->path_type].path;
-      if( path[Ship.sucker->path_state+1].n > 0 )
-      {
-        Ship.sucker->path_state++;
-        Ship.sucker->path_count = path[Ship.sucker->path_state].n;
-        Ship.sucker->shape = SH_ALIEN5D; // reshape the alien into big one with suckered ship on the back
-        c2.sprite_link_content(Ship.sucker->shape, Ship.sucker->sprite);
+        struct path_segment *path;
+        path = Path_types[Ship.sucker->path_type].path;
+        if( path[Ship.sucker->path_state+1].n > 0 )
+        {
+          Ship.sucker->path_state++;
+          Ship.sucker->path_count = path[Ship.sucker->path_state].n;
+          Ship.sucker->shape = SH_ALIEN5D; // reshape the alien into big one with suckered ship on the back
+          c2.sprite_link_content(Ship.sucker->shape, Ship.sucker->sprite);
+        }
       }
       // create new ship (if available) at old position
       s->y = Ship.y;
       c2.Sprite[s->sprite]->y = s->y / FPSCALE - Scenter[s->shape].y;
       immunity = 200;
-      }
       return;
     }
   }
