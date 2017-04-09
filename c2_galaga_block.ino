@@ -914,9 +914,9 @@ void alien_convoy(struct starship *s)
         }
         else if(s->v == 0) // alien restarts after sucking
         {
-          if(Ship.n == 1) // currently there's single fighter ship
+          if(Ship.n == 1 && Ship.suction > 0) // currently there's single fighter ship
           {
-#if 0 // not yet
+#if 0 // not yet, alien must be hit for this to happen
             Ship.n = 2; // double fighter ship
             Fighter->shape = SH_SHIP2; // double ship shape
 #endif
