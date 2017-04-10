@@ -859,7 +859,9 @@ void suction_tracker(void)
 void suction_move(struct starship *s)
 {
   if(s->x < 10*FPSCALE || s->x > 640*FPSCALE || s->y > 480*FPSCALE || s->y < 10*FPSCALE
-  || --s->path_count < 0)
+  || --s->path_count < 0
+  || (Ship.suction == 50) // this will immediately terminate suction bars when ship is taken
+  )
   {
     s->state = S_NONE;
     c2.Sprite[s->sprite]->y = OFF_SCREEN; // off-screen, invisible
@@ -915,22 +917,6 @@ void alien_convoy(struct starship *s)
               s->path_count = path[s->path_state].n;
             }
           }
-        }
-        else if(s->v == 0) // alien restarts after sucking
-        {
-#if 0
-          if(Ship.n == 1 && Ship.suction > 0) // currently there's single fighter ship and is sucked
-          {
-#if 0 // not yet, alien must be hit for this to happen
-            Ship.n = 2; // double fighter ship
-            Fighter->shape = SH_SHIP2; // double ship shape
-            c2.sprite_link_content(Fighter->shape, Fighter->sprite);
-#endif
-            Ship.suction = 1; // 1 before end of suction
-            s->shape = SH_ALIEN5D; // reshape the alien into big one with suckered ship on the back
-            c2.sprite_link_content(s->shape, s->sprite);
-          }
-#endif
         }
       }
       s->a = path[s->path_state].a;
